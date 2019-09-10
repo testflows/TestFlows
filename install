@@ -14,4 +14,4 @@
 # limitations under the License.
 import subprocess
 
-subprocess.run("sudo pip3 install ./dist/*.tar.gz", shell=True)
+subprocess.run("pip3 install ./dist/*.tar.gz", shell=True)
