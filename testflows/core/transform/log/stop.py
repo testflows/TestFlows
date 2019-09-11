@@ -11,13 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import hashlib
+def transform(stop):
+    """Stop pipeline.
 
-#: time resolution (decimal places)
-time_resolution = 3
-#: hash length in bytes
-hash_length = 8
-#: hash function
-hash_func = hashlib.sha1
-#: disable cli colors
-no_color = False
+    :param stop: stop event
+    """
+    line = None
+    while True:
+        if stop.is_set():
+            raise StopIteration
+        line = yield line

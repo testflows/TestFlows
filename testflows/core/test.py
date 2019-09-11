@@ -11,17 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
 import sys
 import time
 import types
 import inspect
 import functools
+import tempfile
+
+import testflows.settings as settings
 
 from .exceptions import DummyTestException, ArgumentError, ResultException
 from .flags import Flags, SKIP, TE
 from .objects import get, Null, Argument
 from .constants import name_sep, id_sep
-from .io import TestIO
+from .io import TestIO, LogWriter
 from .name import join, depth, match
 from .funcs import current_test, skip, ok, fail, error, exception
 
@@ -75,7 +79,7 @@ class Test(object):
         self.child_count = 0
         self.start_time = time.time()
         self.parent = parent
-        self.id = get(id, [0])
+        self.id = get(id, [settings.test_id])
         self.name = get(name, self.name)
         if self.name is None:
             raise TypeError("name must be specified")
@@ -97,7 +101,7 @@ class Test(object):
         self.only = [o.at(self.name) for o in get(only, [])]
         self.start = [s.at(self.name) for s in get(start, [])]
         self.end = [e.at(self.name) for e in get(end, [])]
-        self.io = TestIO(self)
+
         self.caller_test = None
         self.init(**self.args)
 
@@ -136,6 +140,11 @@ class Test(object):
                 raise RuntimeError("only one top level test is allowed")
             current_test.main = self
 
+            # main setup
+            settings.write_logfile = os.path.join(tempfile.gettempdir(),f"testflows.{os.getpid()}.log")
+            settings.read_logfile = settings.write_logfile
+
+        self.io = TestIO(self)
         self.io.output.test_message()
 
         def dummy(*args, **kwargs):
@@ -163,6 +172,7 @@ class Test(object):
         sys.settrace(self.trace)
 
     def __skip__(self, *args):
+        self.io.close()
         sys.settrace(self.trace)
         raise skip("skip flag set", test=self)
 
@@ -201,6 +211,11 @@ class Test(object):
             ok(test=self)
 
         self.io.output.result(self.result)
+        self.io.close()
+
+        # main cleanup
+        if current_test.main is self:
+            LogWriter().fd.close()
 
     def init(self, **args):
         pass

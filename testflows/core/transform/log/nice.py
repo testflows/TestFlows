@@ -63,12 +63,15 @@ formatters = {
     message.RawResultNull: (format_result, f"{result_mark} Null")
 }
 
-def transform(messages):
-    """Transform log lines into a nice format.
-
-    :param messages: parsed messages to process
+def transform():
+    """Transform parsed log line into a nice format.
     """
-    for message in messages:
-        formatter = formatters.get(type(message), None)
-        if formatter:
-            yield formatter[0](message, *formatter[1:])
+    line = None
+    while True:
+        if line is not None:
+            formatter = formatters.get(type(line), None)
+            if formatter:
+                line = formatter[0](line, *formatter[1:])
+            else:
+                line = None
+        line = yield line

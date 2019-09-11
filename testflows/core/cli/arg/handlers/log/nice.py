@@ -22,6 +22,7 @@ from testflows.core.cli.arg.handlers import Handler as HandlerBase
 from testflows.core.transform.log.read import transform as read_transform
 from testflows.core.transform.log.parse import transform as parse_transform
 from testflows.core.transform.log.nice import transform as nice_transform
+from testflows.core.transform.log.write import transform as write_transform
 
 class Handler(HandlerBase):
     @classmethod
@@ -37,16 +38,26 @@ class Handler(HandlerBase):
 
         parser.set_defaults(func=cls())
 
-    def pipeline(self, source):
+    def pipeline(self, input, output):
         steps = [
-            read_transform,
-            parse_transform,
-            nice_transform
+            read_transform(input),
+            parse_transform(),
+            nice_transform(),
+            write_transform(output)
         ]
         for step in steps:
-            source = step(source)
-        return source
+            next(step)
+        return steps
 
     def handle(self, args):
-        for item in self.pipeline(args.input):
-            args.output.write(item)
+        steps = self.pipeline(args.input, args.output)
+        item = None
+        while True:
+            try:
+                for step in steps:
+                    while True:
+                        item = step.send(item)
+                        if item is not None:
+                            break
+            except StopIteration:
+                break

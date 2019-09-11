@@ -22,6 +22,7 @@ setup(
     url="http://testflows.com",
     license="Apache-2.0",
     packages=[
+        "testflows.settings",
         "testflows.core",
         "testflows.core.contrib",
         "testflows.core.utils",

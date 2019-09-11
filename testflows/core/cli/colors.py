@@ -23,7 +23,8 @@
 """ANSII Color formatting for output in terminal."""
 
 import os
-import testflows.core
+
+import testflows.settings as settings
 
 __ALL__ = [ 'colored', 'cprint' ]
 
@@ -111,7 +112,7 @@ def color(text, color=None, on_color=None, attrs=None):
         colored('Hello, World!', 'red', 'on_grey', ['blue', 'blink'])
         colored('Hello, World!', 'green')
     """
-    if not testflows.core.no_color:
+    if not settings.no_colors:
         fmt_str = '\033[%dm%s'
         if color is not None:
             text = fmt_str % (COLORS[color], text)

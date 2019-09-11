@@ -14,12 +14,14 @@
 import re
 import sys
 import time
+import threading
+
+import testflows.settings as settings
 
 from .serialize import dumps
 from .constants import id_sep, end_of_message
 from .exceptions import exception as get_exception
 from .message import Message
-from .settings import time_resolution, hash_func, hash_length
 
 class TestOutput(object):
     """Test output protocol.
@@ -48,10 +50,10 @@ class TestOutput(object):
         """
         rtime = rtime
         if rtime is None:
-            rtime = round(time.time() - self.test.start_time, time_resolution)
-        msg = f"{self.msg_count},{self.prefix},{dumps(stream)},{rtime:.{time_resolution}f},{str(message)}{end_of_message}"
+            rtime = round(time.time() - self.test.start_time, settings.time_resolution)
+        msg = f"{self.msg_count},{self.prefix},{dumps(stream)},{rtime:.{settings.time_resolution}f},{str(message)}{end_of_message}"
         msg = self.rstrip_nulls.sub("", msg)
-        msg_hash = hash_func(f"{self.msg_hash},{keyword},{msg}".encode("utf-8")).hexdigest()[:hash_length]
+        msg_hash = settings.hash_func(f"{self.msg_hash},{keyword},{msg}".encode("utf-8")).hexdigest()[:settings.hash_length]
         self.msg_count += 1
         self.msg_hash = msg_hash
         self.io.write(f"{keyword},\"{msg_hash}\",{msg}")
@@ -86,7 +88,7 @@ class TestOutput(object):
 
         msg = dumps(rstrip_list([
             self.test.name,
-            round(self.test.start_time, time_resolution),
+            round(self.test.start_time, settings.time_resolution),
             str(self.test.flags) or None,
             self.test.uid,
             self.test.description,
@@ -152,7 +154,7 @@ class TestIO(object):
     """
 
     def __init__(self, test):
-        self.io = MessageIO(sys.stdout)
+        self.io = MessageIO(LogIO())
         self.output = TestOutput(test, self.io)
         self.input = TestInput(test, self.io)
 
@@ -184,6 +186,8 @@ class TestIO(object):
     def flush(self):
         self.io.flush()
 
+    def close(self):
+        self.io.close()
 
 class MessageIO(object):
     """Message input and output.
@@ -227,6 +231,8 @@ class MessageIO(object):
             self.io.write(f"{self.buffer}\n")
         self.buffer = ""
 
+    def close(self):
+        self.io.close()
 
 class NamedMessageIO(MessageIO):
     """Message input and output.
@@ -263,3 +269,85 @@ class NamedMessageIO(MessageIO):
         if self.buffer:
             self.io.write(f"{self.buffer}\n", stream=self.stream)
         self.buffer = ""
+
+
+class LogReader(object):
+    '''Read messages from the log.
+    '''
+    def __init__(self):
+        self.fd = open(settings.read_logfile, "r")
+
+    def tell(self):
+        return self.fd.tell()
+
+    def seek(self, pos):
+        return self.fd.seek(pos)
+
+    def read(self, topic, timeout=None):
+        raise NotImplementedError
+
+    def close(self):
+        self.fd.close()
+
+
+class LogWriter(object):
+    '''Singleton log file writer.
+    '''
+    lock = threading.Lock()
+    instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not LogWriter.instance:
+            LogWriter.instance = object.__new__(LogWriter)
+        return LogWriter.instance
+
+    def __init__(self):
+        self.fd = open(settings.write_logfile, "a")
+        self.lock = threading.Lock()
+
+    def write(self, msg):
+        '''Write line buffered messages.
+
+        :param msg: line buffered messages
+        '''
+        with self.lock:
+            n = self.fd.write(msg)
+            self.fd.flush()
+            return n
+
+    def flush(self):
+        with self.lock:
+            return self.fd.flush()
+
+    def close(self):
+        pass
+
+class LogIO(object):
+    '''Log file reader and writer.
+
+    :param read: file descriptor for read
+    :param write: file descriptor for write
+    '''
+    def __init__(self):
+        self.writer = LogWriter()
+        self.reader = LogReader()
+
+    def write(self, msg):
+        return self.writer.write(msg)
+
+    def flush(self):
+        return self.writer.flush()
+
+    def tell(self):
+        return self.reader.tell()
+
+    def seek(self, pos):
+        return self.reader.seek(pos)
+
+    def read(self, topic, timeout=None):
+        return self.reader.read(topic, timeout)
+
+    def close(self):
+        self.writer.close()
+        self.reader.close()
+

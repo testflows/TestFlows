@@ -14,13 +14,16 @@
 import sys
 import json
 
+import testflows.settings as settings
+
 from testflows.core import Message, MessageMap
 from testflows.core.transform.log import message
+from testflows.core.constants import id_sep
 
-def transform(lines):
-    """Transform log lines into parsed list.
+def transform(stop=None):
+    """Transform log line into parsed list.
 
-    :param lines: lines to process
+    :param stop: stop event, default: None
     """
     prefix = message.RawFormat.prefix
 
@@ -42,11 +45,18 @@ def transform(lines):
         message.RawDebug, # DEBUG
         message.RawTrace # TRACE
     )
+    msg = None
+    stop_id = f"{id_sep}{settings.test_id}"
 
-    for line in lines:
-        try:
-            fields = json.loads(f"[{line}]")
-            keyword = fields[prefix.keyword]
-            yield message_map[keyword](*fields)
-        except (IndexError, Exception):
-            raise Exception(f"invalid message: {line}\n")
+    while True:
+        if msg is not None:
+            try:
+                fields = json.loads(f"[{msg}]")
+                keyword = fields[prefix.keyword]
+                msg = message_map[keyword](*fields)
+                if isinstance(msg, message.ResultMessage):
+                    if stop and msg.p_id == stop_id:
+                        stop.set()
+            except (IndexError, Exception):
+                raise Exception(f"invalid message: {msg}\n")
+        msg = yield msg

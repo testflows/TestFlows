@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-def transform(file, messages):
-    """Write messages to a file-like object.
+def transform(file):
+    """Write log line to a file-like object.
 
     :param file: file-like object
-    :param messages: messages
     """
-    for line in messages:
-        file.write(line)
-        yield line
+    line = None
+    while True:
+        if line is not None:
+            file.write(line)
+            file.flush()
+        line = yield line

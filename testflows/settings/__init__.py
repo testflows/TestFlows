@@ -11,18 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-def transform(file, tail=False):
-    """Read lines from a file-like object.
+import uuid
+import hashlib
 
-    :param file: open file handle
-    :param tail: tail mode, default: False
-    """
-    yield None
-    if not tail:
-        for line in file:
-            yield line
-    else:
-        while True:
-            line = file.readline()
-            if line:
-                yield line
+#: time resolution (decimal places)
+time_resolution = 3
+#: hash length in bytes
+hash_length = 8
+#: hash function
+hash_func = hashlib.sha1
+#: disable cli colors
+no_colors = False
+#: test id
+test_id = str(uuid.uuid1())
+#: log file
+write_logfile = None
+read_logfile = None
