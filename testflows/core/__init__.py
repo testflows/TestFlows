@@ -103,15 +103,22 @@ def stdout_handler():
             except StopIteration:
                 break
 
-def main():
-    """Return true if caller is the main module.
-    """
+def init():
     import threading
+
     cleanup()
 
     handler = threading.Thread(target=stdout_handler)
     handler.name = "tfs-output"
     handler.start()
 
+    return True
+
+def main():
+    """Return true if caller is the main module.
+    """
+
     frame = inspect.currentframe().f_back
-    return frame.f_globals["__name__"] == "__main__"
+    if not frame.f_globals["__name__"] == "__main__":
+        return False
+    return init()
