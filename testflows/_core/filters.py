@@ -14,8 +14,8 @@
 # to the end flag
 import copy
 
-from testflows.core.name import absname
-from testflows.core.baseobject import TestObject
+from .name import absname
+from .baseobject import TestObject
 
 class Operator(object):
     Invert, And, Or = (0,1,2)

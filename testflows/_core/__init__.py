@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # Copyright 2019 Vitaliy Zakaznikov (TestFlows Test Framework http://testflows.com)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +11,4 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import subprocess
-
-subprocess.run("pip3 uninstall -y testflows.core", shell=True)
-subprocess.run("pip3 install ./dist/*.tar.gz", shell=True)
+__version__ = "1.2.__VERSION__"

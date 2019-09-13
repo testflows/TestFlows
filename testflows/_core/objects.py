@@ -11,11 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from testflows.core.exceptions import ArgumentError
-from testflows.core.exceptions import RequirementError
-from testflows.core.baseobject import TestObject, TestArg
-from testflows.core.baseobject import get, hash
-from testflows.core.serialize import dumps, loads
+from .exceptions import RequirementError
+from .baseobject import TestObject, TestArg
+from .baseobject import get, hash
 
 class Result(TestObject):
     _fields = ("test", "message")

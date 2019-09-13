@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser(description="TestFlows - Core build script")
 parser.add_argument("--debug", help="enable debugging", action="store_true", default=False)
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-package = os.path.join("testflows", "core")
+package = os.path.join("testflows", "_core")
 init_path = os.path.join(current_dir, package, "__init__.py")
 setup_path = os.path.join(current_dir, "setup.py")
 

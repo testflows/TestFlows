@@ -27,7 +27,12 @@ from .objects import get, Null, Argument
 from .constants import name_sep, id_sep
 from .io import TestIO, LogWriter
 from .name import join, depth, match
-from .funcs import current_test, skip, ok, fail, error, exception
+from .funcs import current_test, main, skip, ok, fail, error, exception
+from .init import init
+from .cli.arg.parser import ArgumentParser
+from .cli.arg.exit import ExitWithError, ExitException
+from .cli.text import danger, warning
+from .exceptions import exception as get_exception
 
 class DummyTest(object):
     """Base class for dummy tests.
@@ -73,9 +78,35 @@ class Test(object):
     flags = Flags()
     name_sep = "."
 
+    @classmethod
+    def argparser(cls):
+        """Parse command line arguments.
+        """
+        try:
+            parser = ArgumentParser(prog=sys.argv[0], description=cls.description, description_prog="Test - Framework")
+            args, unknown = parser.parse_known_args()
+            if unknown:
+                raise ExitWithError(f"unknown argument {unknown}")
+
+        except (ExitException, KeyboardInterrupt, Exception) as exc:
+            sys.stderr.write(warning(get_exception(), eol='\n'))
+            sys.stderr.write(danger("error: " + str(exc).strip()))
+            if isinstance(exc, ExitException):
+                sys.exit(exc.exitcode)
+            else:
+                sys.exit(1)
+
+        return args
+
     def __init__(self, name=None, flags=None, uid=None, tags=None, attributes=None, requirements=None,
                  users=None, tickets=None, description=None, parent=None,
                  only=None, start=None, end=None, args=None, id=None):
+        cli_args = {}
+        if current_test.main is None:
+            frame = inspect.currentframe().f_back
+            if main(frame):
+                cli_args = vars(self.argparser())
+                init()
         self.child_count = 0
         self.start_time = time.time()
         self.parent = parent
@@ -91,6 +122,7 @@ class Test(object):
         self.tickets = get(tickets, self.tickets)
         self.description = get(description, self.description)
         self.args = get(args, {})
+        self.args.update(cli_args)
         self._process_args()
         self.name = join(get(self.parent, name_sep), self.name)
         self.result = Null(self.name)
@@ -249,7 +281,7 @@ class Test(object):
 def test(*args, **kwargs):
     test = kwargs.pop("test", current_test.object)
 
-    callargs = inspect.getcallargs(Test, None, *args, **kwargs)
+    callargs = inspect.getcallargs(Test.__init__, None, *args, **kwargs)
     callargs.pop('self')
     name = callargs["name"]
     only = []

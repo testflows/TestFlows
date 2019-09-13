@@ -22,19 +22,20 @@ setup(
     url="http://testflows.com",
     license="Apache-2.0",
     packages=[
-        "testflows.settings",
         "testflows.core",
-        "testflows.core.contrib",
-        "testflows.core.utils",
-        "testflows.core.transform",
-        "testflows.core.transform.log",
-        "testflows.core.cli",
-        "testflows.core.cli.arg",
-        "testflows.core.cli.arg.handlers",
-        "testflows.core.cli.arg.handlers.log"
+        "testflows.settings",
+        "testflows._core",
+        "testflows._core.contrib",
+        "testflows._core.utils",
+        "testflows._core.transform",
+        "testflows._core.transform.log",
+        "testflows._core.cli",
+        "testflows._core.cli.arg",
+        "testflows._core.cli.arg.handlers",
+        "testflows._core.cli.arg.handlers.log"
         ],
     scripts=[
-        "testflows/core/bin/tfs",
+        "testflows/_core/bin/tfs",
     ],
     zip_safe=False,
     install_requires=[

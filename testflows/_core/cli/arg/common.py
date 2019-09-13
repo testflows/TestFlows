@@ -16,11 +16,13 @@ import functools
 from datetime import datetime
 from argparse import RawDescriptionHelpFormatter
 
-import testflows.core
+from testflows._core import __version__
+from testflows._core.cli.colors import color, white, blue, cyan
 
-from testflows.core.cli.colors import color, white, blue, cyan
+def description(description="", prog="Test Framework", version=None):
+    if version is None:
+        version = __version__
 
-def description(description="", prog="Test Framework", version=testflows.core.__version__):
     """Return argument parser description.
           ---- o o o ----
          |   o       o   |

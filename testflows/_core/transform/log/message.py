@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import inspect
+
+import testflows._core.objects as objects
 from collections import namedtuple as namedtuple
-
-import testflows.core.objects as objects
-
 
 def namedtuple_with_defaults(*args, defaults=()):
     nt = namedtuple(*args)

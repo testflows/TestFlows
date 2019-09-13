@@ -14,11 +14,10 @@
 import re
 import textwrap
 
-from testflows.core import Message
-from testflows.core import Flags
-from testflows.core.transform.log import message
-from testflows.core.utils.timefuncs import strftime, strftimedelta
-from testflows.core.utils.timefuncs import localfromtimestamp
+from testflows._core.flags import Flags
+from testflows._core.transform.log import message
+from testflows._core.utils.timefuncs import strftime, strftimedelta
+from testflows._core.utils.timefuncs import localfromtimestamp
 
 strip_nones = re.compile(r'( None)+$')
 indent = " " * 2

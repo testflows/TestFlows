@@ -11,15 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import re
 import json
 import importlib
-import collections
 
 from json import JSONEncoder
-from json import JSONDecoder
 
-from testflows.core.baseobject import TestArg
+from .baseobject import TestArg
 
 class Encoder(JSONEncoder):
     """Argument value encoder.

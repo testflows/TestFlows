@@ -13,16 +13,16 @@
 # limitations under the License.
 from argparse import FileType
 
-import testflows.core.cli.arg.type as argtype
+import testflows._core.cli.arg.type as argtype
 
-from testflows.core.cli.arg.common import epilog
-from testflows.core.cli.arg.common import description
-from testflows.core.cli.arg.common import RawDescriptionHelpFormatter
-from testflows.core.cli.arg.handlers import Handler as HandlerBase
-from testflows.core.transform.log.read import transform as read_transform
-from testflows.core.transform.log.parse import transform as parse_transform
-from testflows.core.transform.log.nice import transform as nice_transform
-from testflows.core.transform.log.write import transform as write_transform
+from testflows._core.cli.arg.common import epilog
+from testflows._core.cli.arg.common import description
+from testflows._core.cli.arg.common import RawDescriptionHelpFormatter
+from testflows._core.cli.arg.handlers import Handler as HandlerBase
+from testflows._core.transform.log.read import transform as read_transform
+from testflows._core.transform.log.parse import transform as parse_transform
+from testflows._core.transform.log.nice import transform as nice_transform
+from testflows._core.transform.log.write import transform as write_transform
 
 class Handler(HandlerBase):
     @classmethod

@@ -14,6 +14,8 @@
 import uuid
 import hashlib
 
+#: debug mode
+debug = False
 #: time resolution (decimal places)
 time_resolution = 3
 #: hash length in bytes

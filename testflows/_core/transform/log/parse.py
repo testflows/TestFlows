@@ -16,9 +16,9 @@ import json
 
 import testflows.settings as settings
 
-from testflows.core import Message, MessageMap
-from testflows.core.transform.log import message
-from testflows.core.constants import id_sep
+from testflows._core.message import Message, MessageMap
+from testflows._core.transform.log import message
+from testflows._core.constants import id_sep
 
 def transform(stop=None):
     """Transform log line into parsed list.

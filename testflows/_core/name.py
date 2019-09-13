@@ -1,7 +1,7 @@
 """Code is based on Python3.6 posixpath.py.
 """
 import fnmatch
-#: name separator
+
 sep = "/"
 empty = ""
 dot = "."

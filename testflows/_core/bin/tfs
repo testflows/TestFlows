@@ -14,11 +14,10 @@
 # limitations under the License.
 import sys
 
-from testflows.core.exceptions import exception
-from testflows.core.cli.text import danger, warning, success
-from testflows.core.cli.arg.exit import *
-
-from testflows.core.cli.arg.parser import parser
+from testflows._core.exceptions import exception
+from testflows._core.cli.text import danger, warning
+from testflows._core.cli.arg.exit import *
+from testflows._core.cli.arg.parser import parser
 
 try:
     if len(sys.argv) == 1:
@@ -26,11 +25,11 @@ try:
 
     args, unknown = parser.parse_known_args()
     if unknown:
-        raise ExitWithError("unknown arguments")
+        raise ExitWithError(f"unknown argument {unknown}")
     args.func(args)
 
 except (ExitException, KeyboardInterrupt, Exception) as exc:
-    sys.stderr.write(warning(exception(), eol=''))
+    sys.stderr.write(warning(exception(), eol='\n'))
     sys.stderr.write(danger("error: " + str(exc).strip()))
     if isinstance(exc, ExitException):
         sys.exit(exc.exitcode)

@@ -11,11 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from testflows.core.cli.arg.common import epilog
-from testflows.core.cli.arg.common import description
-from testflows.core.cli.arg.common import RawDescriptionHelpFormatter
-from testflows.core.cli.arg.handlers import Handler as HandlerBase
-from testflows.core.cli.arg.handlers.log.nice import Handler as nice_handler
+from testflows._core.cli.arg.common import epilog
+from testflows._core.cli.arg.common import description
+from testflows._core.cli.arg.common import RawDescriptionHelpFormatter
+from testflows._core.cli.arg.handlers import Handler as HandlerBase
+from testflows._core.cli.arg.handlers.log.nice import Handler as nice_handler
 
 class Handler(HandlerBase):
     @classmethod

@@ -11,19 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import textwrap
+
 from argparse import ArgumentParser as ArgumentParserBase
 
-from testflows.core.cli.arg.common import epilog
-from testflows.core.cli.arg.common import description
-from testflows.core.cli.arg.common import RawDescriptionHelpFormatter
-from testflows.core.cli.arg.handlers.log.handler import Handler as log_handler
+from .common import epilog
+from .common import description
+from .common import RawDescriptionHelpFormatter
+from .handlers.log.handler import Handler as log_handler
 
 class ArgumentParser(ArgumentParserBase):
     """Customized argument parser.
     """
     def __init__(self, *args, **kwargs):
+        description_prog = kwargs.pop("description_prog", None)
         kwargs["epilog"] = kwargs.pop("epilog", epilog())
-        kwargs["description"] = kwargs.pop("description", description())
+        kwargs["description"] = description(textwrap.dedent(kwargs.pop("description", "")), prog=description_prog)
         kwargs["formatter_class"] = kwargs.pop("formatter_class", RawDescriptionHelpFormatter)
         return super(ArgumentParser, self).__init__(*args, **kwargs)
 

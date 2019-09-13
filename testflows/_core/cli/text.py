@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from testflows.core.cli.colors import color
+from testflows._core.cli.colors import color
 
 def primary(text, eol="\n"):
     return color(text + eol, "white", attrs=["bold"])
