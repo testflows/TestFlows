@@ -18,6 +18,8 @@ import glob
 import tempfile
 import threading
 
+import testflows.settings as settings
+
 def cleanup():
     """Clean up old temporary log files.
     """
@@ -53,15 +55,23 @@ def cleanup():
             except OSError:
                 raise
 
+def stdout_raw_handler():
+    """Handler to output messages to sys.stdout
+    using "raw" format.
+    """
+    from .transform.log.pipeline import RawLogPipeline
+
+    with open(settings.read_logfile, "a+", buffering=1) as log:
+        log.seek(0)
+        RawLogPipeline(log, sys.stdout, tail=True).run()
+
 def stdout_nice_handler():
     """Handler to output messages to sys.stdout
     using "nice" format.
     """
     from .transform.log.pipeline import NiceLogPipeline
 
-    tmp_logfile = os.path.join(tempfile.gettempdir(), f"testflows.{os.getpid()}.log")
-
-    with open(tmp_logfile, "a+", buffering=1) as log:
+    with open(settings.read_logfile, "a+", buffering=1) as log:
         log.seek(0)
         NiceLogPipeline(log, sys.stdout, tail=True).run()
 
@@ -75,6 +85,13 @@ def init():
     """
     cleanup()
 
-    handler = threading.Thread(target=stdout_nice_handler)
+    output_handler_map = {
+        "raw": stdout_raw_handler,
+        "nice": stdout_nice_handler,
+        "silent": stdout_silent_handler,
+        "quiet": stdout_silent_handler
+    }
+    # start stdout output handler
+    handler = threading.Thread(target=output_handler_map[settings.output_format])
     handler.name = "tfs-output"
     handler.start()

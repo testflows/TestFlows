@@ -15,46 +15,26 @@ import json
 
 import testflows.settings as settings
 
-from testflows._core.message import MessageMap
 from testflows._core.transform.log import message
+from testflows._core.message import Message
 from testflows._core.constants import id_sep
 
 def transform(stop=None):
-    """Transform log line into parsed list.
-
-    :param stop: stop event, default: None
+    """Transform raw message into raw format.
     """
-    prefix = message.RawFormat.prefix
-
-    message_map = MessageMap(
-        message.RawNone, # NONE
-        message.RawTest, # TEST
-        message.RawResultNull, # NULL
-        message.RawResultOK, # OK
-        message.RawResultFail, # FAIL
-        message.RawResultSkip, # SKIP
-        message.RawResultError, # ERROR
-        message.RawAttribute, # ATTRIBUTE
-        message.RawArgument, # ARGUMENT
-        message.RawDescription, # DESCRIPTION
-        message.RawRequirement, # REQUIREMENT
-        message.RawException, # EXCEPTION
-        message.RawValue, # VALUE
-        message.RawNote, # NOTE
-        message.RawDebug, # DEBUG
-        message.RawTrace # TRACE
-    )
     msg = None
     stop_id = f"{id_sep}{settings.test_id}"
+    prefix = message.RawFormat.prefix
 
     while True:
         if msg is not None:
             try:
-                fields = json.loads(f"[{msg}]")
-                keyword = fields[prefix.keyword]
-                msg = message_map[keyword](*fields)
-                if isinstance(msg, message.ResultMessage):
-                    if stop and msg.p_id == stop_id:
+                if stop:
+                    fields = json.loads(f"[{msg}]")
+                    if fields[prefix.keyword] \
+                            in (Message.SKIP, Message.NULL, Message.FAIL,
+                                Message.ERROR, Message.OK) \
+                            and fields[prefix.id] == stop_id:
                         stop.set()
             except (IndexError, Exception):
                 raise Exception(f"invalid message: {msg}\n")

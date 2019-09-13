@@ -26,6 +26,8 @@ hash_func = hashlib.sha1
 no_colors = False
 #: test id
 test_id = str(uuid.uuid1())
+#: output handler format
+output_format = None
 #: log file
 write_logfile = None
 read_logfile = None
