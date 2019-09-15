@@ -22,7 +22,9 @@ def transform(file, tail=False):
         for line in file:
             yield line
     else:
+        line = ""
         while True:
-            line = file.readline()
-            if line:
+            line += file.readline()
+            if line.endswith("\n"):
                 yield line
+                line = ""
