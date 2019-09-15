@@ -19,6 +19,7 @@ from .nice import transform as nice_transform
 from .write import transform as write_transform
 from .stop import transform as stop_transform
 from .raw import transform as raw_transform
+from .short import transform as short_transform
 
 class Pipeline(object):
     """Combines multiple steps into a pipeline
@@ -37,10 +38,9 @@ class Pipeline(object):
         while True:
             try:
                 for step in self.steps:
-                    while True:
-                        item = step.send(item)
-                        if item is not None:
-                            break
+                    item = step.send(item)
+                    if item is None:
+                        break
             except StopIteration:
                 break
 
@@ -55,6 +55,19 @@ class RawLogPipeline(Pipeline):
             stop_transform(stop_event)
         ]
         super(RawLogPipeline, self).__init__(steps)
+
+class ShortLogPipeline(Pipeline):
+    def __init__(self, input, output, tail=False):
+        stop_event = threading.Event()
+
+        steps = [
+            read_transform(input, tail=tail),
+            parse_transform(stop_event),
+            short_transform(),
+            write_transform(output),
+            stop_transform(stop_event)
+        ]
+        super(ShortLogPipeline, self).__init__(steps)
 
 class NiceLogPipeline(Pipeline):
     def __init__(self, input, output, tail=False):

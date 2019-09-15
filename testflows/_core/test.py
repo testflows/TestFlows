@@ -86,7 +86,7 @@ class Test(object):
         """
         parser = ArgumentParser(
                 prog=sys.argv[0],
-                description=cls.description,
+                description=(cls.description or ""),
                 description_prog="Test - Framework"
             )
         parser.add_argument("--debug", dest="_debug", action="store_true",
@@ -95,8 +95,8 @@ class Test(object):
             help="disable terminal color highlighting", default=False)
         parser.add_argument("--id", metavar="id", dest="_id", type=str, help="custom test id")
         parser.add_argument("-o", "--output", dest="_output", metavar="format", type=str,
-            choices=["nice", "quiet", "raw", "silent"], default="nice",
-            help="""stdout output format, choices are: ['nice','quiet','raw','silent'],
+            choices=["nice", "quiet", "short", "raw", "silent"], default="nice",
+            help="""stdout output format, choices are: ['nice','short','quiet','raw','silent'],
                 default: 'nice'""")
         parser.add_argument("-l", "--log", dest="_log", metavar="file", type=str,
             help="path to the log file where test output will be stored, default: uses temporary log file")
@@ -142,8 +142,8 @@ class Test(object):
             settings.output_format = args.pop("_output")
 
         except (ExitException, KeyboardInterrupt, Exception) as exc:
-            if settings.debug:
-                sys.stderr.write(warning(get_exception(), eol='\n'))
+            #if settings.debug:
+            sys.stderr.write(warning(get_exception(), eol='\n'))
             sys.stderr.write(danger("error: " + str(exc).strip()))
             if isinstance(exc, ExitException):
                 sys.exit(exc.exitcode)
@@ -153,7 +153,7 @@ class Test(object):
 
     def __init__(self, name=None, flags=None, uid=None, tags=None, attributes=None, requirements=None,
                  users=None, tickets=None, description=None, parent=None,
-                 only=None, start=None, end=None, args=None, id=None):
+                 only=None, start=None, end=None, args=None, id=None, _frame=None):
         global current_test
 
         cli_args = {}
@@ -161,7 +161,9 @@ class Test(object):
             if current_test.main is not None:
                 raise RuntimeError("only one top level test is allowed")
             current_test.main = self
-            frame = inspect.currentframe().f_back
+            frame = _frame
+            if frame is None:
+                frame = inspect.currentframe().f_back
             if main(frame):
                 cli_args = self.parse_cli_args()
 
@@ -362,5 +364,8 @@ def test(*args, **kwargs):
         callargs["start"] = start
     if end:
         callargs["end"] = end
+
+    if not test and not current_test.main:
+        callargs["_frame"] = inspect.currentframe().f_back
 
     return Test(**callargs)

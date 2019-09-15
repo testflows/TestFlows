@@ -14,4 +14,5 @@
 from testflows._core.test import Test, test
 from testflows._core.funcs import *
 from testflows._core.objects import *
+from testflows._core.name import *
 from testflows._core import __version__

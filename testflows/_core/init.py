@@ -20,6 +20,10 @@ import threading
 
 import testflows.settings as settings
 
+from .transform.log.pipeline import RawLogPipeline
+from .transform.log.pipeline import NiceLogPipeline
+from .transform.log.pipeline import ShortLogPipeline
+
 def cleanup():
     """Clean up old temporary log files.
     """
@@ -59,18 +63,22 @@ def stdout_raw_handler():
     """Handler to output messages to sys.stdout
     using "raw" format.
     """
-    from .transform.log.pipeline import RawLogPipeline
-
     with open(settings.read_logfile, "a+", buffering=1) as log:
         log.seek(0)
         RawLogPipeline(log, sys.stdout, tail=True).run()
+
+def stdout_short_handler():
+    """Handler to output messages to sys.stdout
+    using "short" format.
+    """
+    with open(settings.read_logfile, "a+", buffering=1) as log:
+        log.seek(0)
+        ShortLogPipeline(log, sys.stdout, tail=True).run()
 
 def stdout_nice_handler():
     """Handler to output messages to sys.stdout
     using "nice" format.
     """
-    from .transform.log.pipeline import NiceLogPipeline
-
     with open(settings.read_logfile, "a+", buffering=1) as log:
         log.seek(0)
         NiceLogPipeline(log, sys.stdout, tail=True).run()
@@ -89,7 +97,8 @@ def init():
         "raw": stdout_raw_handler,
         "nice": stdout_nice_handler,
         "silent": stdout_silent_handler,
-        "quiet": stdout_silent_handler
+        "quiet": stdout_silent_handler,
+        "short": stdout_short_handler
     }
     # start stdout output handler
     handler = threading.Thread(target=output_handler_map[settings.output_format])
