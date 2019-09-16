@@ -29,8 +29,8 @@ class Timer(object):
 
     def stop(self):
         """Stop timer."""
-        self.stopped = True
         self.stopped_time = self.time()
+        self.stopped = True
 
     def time(self):
         """Return timer value."""
