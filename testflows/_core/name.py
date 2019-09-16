@@ -1,6 +1,7 @@
 """Code is based on Python3.6 posixpath.py.
 """
-import fnmatch
+import re
+import functools
 
 sep = "/"
 empty = ""
@@ -9,12 +10,13 @@ dotdot = ".."
 pardir = dotdot
 curdir = dot
 
-def match(name, pat):
+def match(name, pat, prefix=False):
     """Test whether FILENAME matches PATTERN.
 
-    Patterns are Unix shell style:
+    Patterns are modified Unix shell style:
 
     *       matches everything
+    :       matches everything but path separator '/'
     ?       matches any single character
     [seq]   matches any character in seq
     [!seq]  matches any char not in seq
@@ -22,31 +24,107 @@ def match(name, pat):
     An initial period in FILENAME is not special.
     Both FILENAME and PATTERN are first case-normalized
     if the operating system requires it.
-    If you don't want this, use fnmatchcase(FILENAME, PATTERN).
+    If you don't want this, use matchcase(FILENAME, PATTERN).
     """
-    return fnmatch.fnmatch(name, pat)
+    name = normcase(name)
+    pat = normcase(pat)
+    return matchcase(name, pat, prefix=prefix)
 
-def filter(names, pat):
+def filter(names, pat, prefix=False):
     """Return the subset of the list NAMES that match PAT.
     """
-    return fnmatch.filter(names, pat)
+    result = []
+    match = _compile_pattern(pat, prefix=prefix)
+    # normcase is NOP. Optimize it away from the loop.
+    for name in names:
+        if match(name):
+            result.append(name)
+    return result
 
-def matchcase(name, pat):
+def matchcase(name, pat, prefix=False):
     """Test whether FILENAME matches PATTERN, including case.
+
+    Patterns are modified Unix shell style:
+
+    *       matches everything
+    :       matches everything but path separator '/'
+    ?       matches any single character
+    [seq]   matches any character in seq
+    [!seq]  matches any char not in seq
 
     This is a version of fnmatch() which doesn't case-normalize
     its arguments.
     """
-    return fnmatch.fnmatchcase(name, pat)
+    match = _compile_pattern(pat, prefix=prefix)
+    return match(name) is not None
 
-def translate(pat):
+@functools.lru_cache(maxsize=256, typed=True)
+def _compile_pattern(pat, prefix=False):
+    res = translate(pat, prefix=prefix)
+    return re.compile(res).match
+
+def translate(pat, prefix=False):
+    """Translate a shell PATTERN to a regular expression.
+
+    If prefix is set to True, then translates a shell
+    PATTERN to a regular expression that matches
+    longest prefix of the path.
+
+    For example the pattern  'A/B/C' would match
+    'A', 'A/B' , 'A/B/C'
+    as all are prefixes of the full match 'A/B/C'.
+
+    However it would not match any path prefix
+    that ends with '/' such as 'A/', or 'A/B/'
+    as these paths are treated as incompleted.
+    If you need to match such path you need to
+    rstrip() the '/' before matching.
+
+    There is no way to quote meta-characters.
+    """
+    if prefix:
+        return _translate_prefix(pat)
+    return _translate(pat)
+
+def _translate(pat):
     """Translate a shell PATTERN to a regular expression.
 
     There is no way to quote meta-characters.
     """
-    return fnmatch.translate(pat)
+    i, n = 0, len(pat)
+    res = ''
+    while i < n:
+        c = pat[i]
+        i = i+1
+        if c == '*':
+            res = res + '.*'
+        elif c == ':':
+            res = res + '[^/]+'
+        elif c == '?':
+            res = res + '.'
+        elif c == '[':
+            j = i
+            if j < n and pat[j] == '!':
+                j = j+1
+            if j < n and pat[j] == ']':
+                j = j+1
+            while j < n and pat[j] != ']':
+                j = j+1
+            if j >= n:
+                res = res + '\\['
+            else:
+                stuff = pat[i:j].replace('\\','\\\\')
+                i = j+1
+                if stuff[0] == '!':
+                    stuff = '^' + stuff[1:]
+                elif stuff[0] == '^':
+                    stuff = '\\' + stuff
+                res = '%s[%s]' % (res, stuff)
+        else:
+            res = res + re.escape(c)
+    return r'(?s:%s)\Z' % res
 
-def translate_longest_prefix(pat):
+def _translate_prefix(pat):
     """Translate a shell PATTERN to a regular expression
     that matches longest prefix of the path.
 
@@ -75,6 +153,9 @@ def translate_longest_prefix(pat):
         elif c == '*':
             level += 1
             res = res + '(.*'
+        elif c == ':':
+            level += 1
+            res = res + '([^/]+'
         elif c == '?':
             level += 1
             res = res + '(.'
@@ -264,3 +345,8 @@ def commonname(names):
 
     prefix = sep if isabs else sep[:0]
     return prefix + sep.join(common)
+
+def normcase(s):
+    """Normalize case of pathname.
+    """
+    return s
