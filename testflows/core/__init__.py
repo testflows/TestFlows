@@ -16,3 +16,5 @@ from testflows._core.funcs import *
 from testflows._core.objects import *
 from testflows._core.name import *
 from testflows._core import __version__
+
+import testflows._core.utils as utils
