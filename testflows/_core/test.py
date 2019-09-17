@@ -18,6 +18,7 @@ import types
 import inspect
 import functools
 import tempfile
+import importlib
 
 import testflows.settings as settings
 
@@ -332,31 +333,32 @@ class Test(object):
 
 
 def test(*args, **kwargs):
-    test = kwargs.pop("test", current_test.object)
+    parent = kwargs.pop("parent", current_test.object)
+    TestClass = kwargs.pop("testclass", Test)
 
-    callargs = inspect.getcallargs(Test.__init__, None, *args, **kwargs)
+    callargs = inspect.getcallargs(TestClass.__init__, None, *args, **kwargs)
     callargs.pop('self')
     name = callargs["name"]
     only = []
     start = []
     end = []
 
-    if test:
-        if test.only:
-            for expr in test.only:
-                if match(test.name, expr.suite):
+    if parent:
+        if parent.only:
+            for expr in parent.only:
+                if match(parent.name, expr.suite):
                     if not match(name, expr.test):
                         if expr.tags:
                             if not expr.tags.intersection(callargs["tags"] or {}):
                                 return DummyTest()
                         else:
                             return DummyTest()
-                if match(join(test.name, name), expr.suite):
+                if match(join(parent.name, name), expr.suite):
                     only.append(expr)
 
-        callargs["parent"] = test.name
-        callargs["id"] = test.id + [test.child_count]
-        test.child_count += 1
+        callargs["parent"] = parent.name
+        callargs["id"] = parent.id + [parent.child_count]
+        parent.child_count += 1
 
     if only:
         callargs["only"] = only
@@ -365,7 +367,38 @@ def test(*args, **kwargs):
     if end:
         callargs["end"] = end
 
-    if not test and not current_test.main:
+    if not parent and not current_test.main:
         callargs["_frame"] = inspect.currentframe().f_back
 
-    return Test(**callargs)
+    return TestClass(**callargs)
+
+def run(path, test=None, *args, **kwargs):
+    """Run a test case specified by module path
+    and optional test class or method.
+
+    :param path: test case module path
+    :param test: test case object, default: None
+    :param *args: *args
+    :param **kwargs: **kwargs
+    """
+    module = importlib.import_module(path)
+    if test:
+        test = getattr(module, test, None)
+    if test is None:
+        test = getattr(module, "Test", None)
+    if test is None:
+        test = getattr(module, "TestCase", None)
+    if test is None:
+        test = getattr(module, "TestSuite", None)
+
+    callargs = inspect.getcallargs(test.__init__, None, *args, **kwargs)
+    callargs.pop('self')
+
+    name = callargs["name"]
+    if name:
+        callargs["name"] = name % {"name": test.name}
+
+    with globals()["test"](**callargs, testclass=test):
+        pass
+
+

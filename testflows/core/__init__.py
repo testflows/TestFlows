@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from testflows._core.test import Test, test
+from testflows._core.test import Test, test, run
 from testflows._core.funcs import *
 from testflows._core.objects import *
 from testflows._core.name import *
