@@ -26,6 +26,7 @@ setup(
         "testflows.settings",
         "testflows._core",
         "testflows._core.contrib",
+        "testflows._core.contrib.arpeggio",
         "testflows._core.utils",
         "testflows._core.transform",
         "testflows._core.transform.log",
