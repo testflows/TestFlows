@@ -333,8 +333,8 @@ class Test(object):
 
 
 def test(*args, **kwargs):
-    parent = kwargs.pop("parent", current_test.object)
-    TestClass = kwargs.pop("testclass", Test)
+    parent = kwargs.pop("parent", None) or current_test.object
+    TestClass = kwargs.pop("testclass", None) or Test
 
     callargs = inspect.getcallargs(TestClass.__init__, None, *args, **kwargs)
     callargs.pop('self')
