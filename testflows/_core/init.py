@@ -63,7 +63,7 @@ def stdout_raw_handler():
     """Handler to output messages to sys.stdout
     using "raw" format.
     """
-    with open(settings.read_logfile, "a+", buffering=1) as log:
+    with open(settings.read_logfile, "a+", buffering=1, encoding="utf-8") as log:
         log.seek(0)
         RawLogPipeline(log, sys.stdout, tail=True).run()
 
@@ -71,7 +71,7 @@ def stdout_short_handler():
     """Handler to output messages to sys.stdout
     using "short" format.
     """
-    with open(settings.read_logfile, "a+", buffering=1) as log:
+    with open(settings.read_logfile, "a+", buffering=1, encoding="utf-8") as log:
         log.seek(0)
         ShortLogPipeline(log, sys.stdout, tail=True).run()
 
@@ -79,7 +79,7 @@ def stdout_nice_handler():
     """Handler to output messages to sys.stdout
     using "nice" format.
     """
-    with open(settings.read_logfile, "a+", buffering=1) as log:
+    with open(settings.read_logfile, "a+", buffering=1, encoding="utf-8") as log:
         log.seek(0)
         NiceLogPipeline(log, sys.stdout, tail=True).run()
 

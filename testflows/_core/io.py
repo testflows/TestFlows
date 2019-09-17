@@ -275,7 +275,7 @@ class LogReader(object):
     '''Read messages from the log.
     '''
     def __init__(self):
-        self.fd = open(settings.read_logfile, "r")
+        self.fd = open(settings.read_logfile, "r", buffering=1, encoding="utf-8")
 
     def tell(self):
         return self.fd.tell()
@@ -302,7 +302,7 @@ class LogWriter(object):
         return LogWriter.instance
 
     def __init__(self):
-        self.fd = open(settings.write_logfile, "a")
+        self.fd = open(settings.write_logfile, "a", buffering=1, encoding="utf-8")
         self.lock = threading.Lock()
 
     def write(self, msg):
