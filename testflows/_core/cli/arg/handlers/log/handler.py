@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from testflows._core.cli.arg.common import epilog
-from testflows._core.cli.arg.common import description
 from testflows._core.cli.arg.common import RawDescriptionHelpFormatter
 from testflows._core.cli.arg.handlers import Handler as HandlerBase
 from testflows._core.cli.arg.handlers.log.nice import Handler as nice_handler
@@ -21,7 +20,7 @@ class Handler(HandlerBase):
     @classmethod
     def add_command(cls, commands):
         parser = commands.add_parser("log", help="log processing", epilog=epilog(),
-            description=description("Work with logs."),
+            description="Work with logs.",
             formatter_class=RawDescriptionHelpFormatter)
 
         log_commands = parser.add_subparsers(title="commands", metavar="command",

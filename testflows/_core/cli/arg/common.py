@@ -19,7 +19,7 @@ from argparse import RawDescriptionHelpFormatter
 from testflows._core import __version__
 from testflows._core.cli.colors import color, white, blue, cyan
 
-def description(description="", prog="Test Framework", version=None):
+def description(description=None, prog=None, version=None):
     if version is None:
         version = __version__
 
@@ -41,6 +41,11 @@ def description(description="", prog="Test Framework", version=None):
     dim_white = functools.partial(white, attrs=["dim"])
     bold_blue = functools.partial(blue, attrs=["bold"])
     bold_cyan = functools.partial(cyan, attrs=["bold"])
+
+    if description is None:
+        description = ""
+    if prog is None:
+        prog = "Test Framework"
 
     desc =  dim_white("  ---- ") + bold_blue("o o o") + dim_white(" ----") + "\n"
     desc += dim_white(" |   ") + bold_blue("o       o") + dim_white("   |") + "\n"

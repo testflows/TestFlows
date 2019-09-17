@@ -16,7 +16,6 @@ from argparse import FileType
 import testflows._core.cli.arg.type as argtype
 
 from testflows._core.cli.arg.common import epilog
-from testflows._core.cli.arg.common import description
 from testflows._core.cli.arg.common import RawDescriptionHelpFormatter
 from testflows._core.cli.arg.handlers import Handler as HandlerBase
 from testflows._core.transform.log.read import transform as read_transform
@@ -28,7 +27,7 @@ class Handler(HandlerBase):
     @classmethod
     def add_command(cls, commands):
         parser = commands.add_parser("nice", help="nice transform", epilog=epilog(),
-            description=description("Transform log into a nice format."),
+            description="Transform log into a nice format.",
             formatter_class=RawDescriptionHelpFormatter)
 
         parser.add_argument("input", metavar="input", type=argtype.file("r"),
