@@ -31,9 +31,9 @@ class Handler(HandlerBase):
             description=description("Transform log into a nice format."),
             formatter_class=RawDescriptionHelpFormatter)
 
-        parser.add_argument("input", metavar="input", type=argtype.file("r", bufsize=0),
+        parser.add_argument("input", metavar="input", type=argtype.file("r"),
                 nargs="?", help="input log, default: stdin", default="-")
-        parser.add_argument("output", metavar="output", type=argtype.file("w", bufsize=0),
+        parser.add_argument("output", metavar="output", type=argtype.file("w"),
                 nargs="?", help='output file, default: stdout', default="-")
 
         parser.set_defaults(func=cls())
