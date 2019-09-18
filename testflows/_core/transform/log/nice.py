@@ -42,7 +42,8 @@ def format_test(msg, keyword):
     started = strftime(localfromtimestamp(msg.started))
     _keyword = color_keyword(keyword)
     _name = color_other(split(msg.name)[-1])
-    return color_other(f"{started:>20}") + f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name} {color_other(Flags(msg.flags))}\n"
+    out = color_other(f"{started:>20}") + f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name}{color_other(', flags:' + str(Flags(msg.flags)) if msg.flags else '')}\n"
+    return out
 
 def format_result(msg, result):
     _result = color_result(result)
