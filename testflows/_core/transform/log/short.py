@@ -13,14 +13,15 @@
 # limitations under the License.
 from testflows._core.flags import Flags
 from testflows._core.transform.log import message
+from testflows._core.name import split
 
 indent = " " * 2
 
 def format_test(msg, keyword):
-    return f"{indent * (msg.p_id.count('/') - 1)}{keyword} {msg.name} {Flags(msg.flags)}\n"
+    return f"{indent * (msg.p_id.count('/') - 1)}{keyword} {split(msg.name)[-1]} {Flags(msg.flags)}\n"
 
 def format_result(msg, result):
-    return f"{indent * (msg.p_id.count('/') - 1)}{result} {msg.test}\n"
+    return f"{indent * (msg.p_id.count('/') - 1)}{result} {split(msg.test)[-1]}\n"
 
 formatters = {
     message.RawTest: (format_test, f"Test"),

@@ -18,16 +18,17 @@ from testflows._core.flags import Flags
 from testflows._core.transform.log import message
 from testflows._core.utils.timefuncs import strftime, strftimedelta
 from testflows._core.utils.timefuncs import localfromtimestamp
+from testflows._core.name import split
 
 strip_nones = re.compile(r'( None)+$')
 indent = " " * 2
 
 def format_test(msg, keyword):
     started = strftime(localfromtimestamp(msg.started))
-    return f"{started:>20}{'':3}{indent * (msg.p_id.count('/') - 1)}{keyword} {msg.name} {Flags(msg.flags)}\n"
+    return f"{started:>20}{'':3}{indent * (msg.p_id.count('/') - 1)}{keyword} {split(msg.name)[-1]} {Flags(msg.flags)}\n"
 
 def format_result(msg, result):
-    return f"{strftimedelta(msg.p_time):>20}{'':3}{indent * (msg.p_id.count('/') - 1)}{result} {msg.test}\n"
+    return f"{strftimedelta(msg.p_time):>20}{'':3}{indent * (msg.p_id.count('/') - 1)}{result} {split(msg.test)[-1]}\n"
 
 def format_other(msg, keyword):
     fields = ' '.join([str(f) for f in msg[message.Prefix.time + 1:]])
