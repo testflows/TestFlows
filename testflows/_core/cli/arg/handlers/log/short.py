@@ -18,13 +18,13 @@ import testflows._core.cli.arg.type as argtype
 from testflows._core.cli.arg.common import epilog
 from testflows._core.cli.arg.common import RawDescriptionHelpFormatter
 from testflows._core.cli.arg.handlers import Handler as HandlerBase
-from testflows._core.transform.log.pipeline import NiceLogPipeline
+from testflows._core.transform.log.pipeline import ShortLogPipeline
 
 class Handler(HandlerBase):
     @classmethod
     def add_command(cls, commands):
-        parser = commands.add_parser("nice", help="nice transform", epilog=epilog(),
-            description="Transform log into a nice format.",
+        parser = commands.add_parser("short", help="short transform", epilog=epilog(),
+            description="Transform log into a short format.",
             formatter_class=RawDescriptionHelpFormatter)
 
         parser.add_argument("input", metavar="input", type=argtype.file("r", bufsize=1, encoding="utf-8"),
@@ -35,4 +35,4 @@ class Handler(HandlerBase):
         parser.set_defaults(func=cls())
 
     def handle(self, args):
-        NiceLogPipeline(args.input, args.output).run()
+        ShortLogPipeline(args.input, args.output).run()

@@ -15,6 +15,7 @@ from testflows._core.cli.arg.common import epilog
 from testflows._core.cli.arg.common import RawDescriptionHelpFormatter
 from testflows._core.cli.arg.handlers import Handler as HandlerBase
 from testflows._core.cli.arg.handlers.log.nice import Handler as nice_handler
+from testflows._core.cli.arg.handlers.log.short import Handler as short_handler
 
 class Handler(HandlerBase):
     @classmethod
@@ -27,3 +28,4 @@ class Handler(HandlerBase):
             description=None, help=None)
         log_commands.required = True
         nice_handler.add_command(log_commands)
+        short_handler.add_command(log_commands)

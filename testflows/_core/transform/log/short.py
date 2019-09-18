@@ -17,10 +17,10 @@ from testflows._core.transform.log import message
 indent = " " * 2
 
 def format_test(msg, keyword):
-    return f"{indent * (msg.p_id.count('/') - 1)}{keyword} \"{msg.name}\" {Flags(msg.flags)}\n"
+    return f"{indent * (msg.p_id.count('/') - 1)}{keyword} {msg.name} {Flags(msg.flags)}\n"
 
 def format_result(msg, result):
-    return f"{indent * (msg.p_id.count('/') - 1)}{result} \"{msg.test}\"\n"
+    return f"{indent * (msg.p_id.count('/') - 1)}{result} {msg.test}\n"
 
 formatters = {
     message.RawTest: (format_test, f"Test"),
