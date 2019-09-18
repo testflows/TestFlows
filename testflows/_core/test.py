@@ -338,34 +338,11 @@ def test(*args, **kwargs):
 
     callargs = inspect.getcallargs(TestClass.__init__, None, *args, **kwargs)
     callargs.pop('self')
-    name = callargs["name"]
-    only = []
-    start = []
-    end = []
 
     if parent:
-        if parent.only:
-            for expr in parent.only:
-                if match(parent.name, expr.suite):
-                    if not match(name, expr.test):
-                        if expr.tags:
-                            if not expr.tags.intersection(callargs["tags"] or {}):
-                                return DummyTest()
-                        else:
-                            return DummyTest()
-                if match(join(parent.name, name), expr.suite):
-                    only.append(expr)
-
         callargs["parent"] = parent.name
         callargs["id"] = parent.id + [parent.child_count]
         parent.child_count += 1
-
-    if only:
-        callargs["only"] = only
-    if start:
-        callargs["start"] = start
-    if end:
-        callargs["end"] = end
 
     if not parent and not current_test.main:
         callargs["_frame"] = inspect.currentframe().f_back
@@ -385,11 +362,11 @@ def run(path, test=None, *args, **kwargs):
     if test:
         test = getattr(module, test, None)
     if test is None:
-        test = getattr(module, "Test", None)
-    if test is None:
         test = getattr(module, "TestCase", None)
     if test is None:
         test = getattr(module, "TestSuite", None)
+    if test is None:
+        test = getattr(module, "Test", None)
 
     callargs = inspect.getcallargs(test.__init__, None, *args, **kwargs)
     callargs.pop('self')
