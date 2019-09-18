@@ -19,10 +19,10 @@ from testflows._core.cli.colors import color
 indent = " " * 2
 
 def color_keyword(keyword):
-    return color(split(keyword)[-1], "white", attrs=["dim"])
+    return color(split(keyword)[-1], "white", attrs=["bold"])
 
 def color_test_name(name):
-    return color(split(name)[-1], "cyan", attrs=["bold"])
+    return color(split(name)[-1], "white", attrs=["dim"])
 
 def color_result(result):
     if result == "OK":
@@ -35,12 +35,11 @@ def color_result(result):
 def format_test(msg, keyword):
     _keyword = color_keyword(keyword)
     _name = color_test_name(split(msg.name)[-1])
-    return f"{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name} {Flags(msg.flags)}\n"
+    return f"{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name}\n"
 
 def format_result(msg, result):
     _result = color_result(result)
-    _test = color_test_name(split(msg.test)[-1])
-    return f"{indent * (msg.p_id.count('/') - 1)}{_result} {_test}\n"
+    return f"{indent * (msg.p_id.count('/') - 1)}{_result}\n"
 
 formatters = {
     message.RawTest: (format_test, f"Test"),

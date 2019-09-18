@@ -19,16 +19,35 @@ from testflows._core.transform.log import message
 from testflows._core.utils.timefuncs import strftime, strftimedelta
 from testflows._core.utils.timefuncs import localfromtimestamp
 from testflows._core.name import split
+from testflows._core.cli.colors import color
 
 strip_nones = re.compile(r'( None)+$')
 indent = " " * 2
 
+def color_keyword(keyword):
+    return color(split(keyword)[-1], "white", attrs=["bold"])
+
+def color_other(other):
+    return color(other, "white", attrs=["dim"])
+
+def color_result(result):
+    if result.endswith("OK"):
+        return color(result, "green", attrs=["bold"])
+    elif result.endswith("Skip"):
+        return color(result, "cyan", attrs=["bold"])
+    # Error, Fail, Null
+    return color(result, "red", attrs=["bold"])
+
 def format_test(msg, keyword):
     started = strftime(localfromtimestamp(msg.started))
-    return f"{started:>20}{'':3}{indent * (msg.p_id.count('/') - 1)}{keyword} {split(msg.name)[-1]} {Flags(msg.flags)}\n"
+    _keyword = color_keyword(keyword)
+    _name = color_other(split(msg.name)[-1])
+    return color_other(f"{started:>20}") + f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name} {color_other(Flags(msg.flags))}\n"
 
 def format_result(msg, result):
-    return f"{strftimedelta(msg.p_time):>20}{'':3}{indent * (msg.p_id.count('/') - 1)}{result} {split(msg.test)[-1]}\n"
+    _result = color_result(result)
+    _test = color_other(split(msg.test)[-1])
+    return color_other(f"{strftimedelta(msg.p_time):>20}") + f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_result} {_test}\n"
 
 def format_other(msg, keyword):
     fields = ' '.join([str(f) for f in msg[message.Prefix.time + 1:]])
@@ -39,7 +58,7 @@ def format_other(msg, keyword):
     fields = textwrap.indent(fields, prefix=(indent * (msg.p_id.count('/') - 1) + " " * 30))
     fields = fields.lstrip(" ")
 
-    return f"{strftimedelta(msg.p_time):>20}{'':3}{indent * (msg.p_id.count('/') - 1)}{keyword} {fields}\n"
+    return color_other(f"{strftimedelta(msg.p_time):>20}{'':3}{indent * (msg.p_id.count('/') - 1)}{keyword} {fields}\n")
 
 mark = "\u27e5"
 result_mark = "\u27e5\u27e4"

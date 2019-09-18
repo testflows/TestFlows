@@ -24,7 +24,7 @@ import testflows.settings as settings
 
 from .exceptions import DummyTestException, ArgumentError, ResultException
 from .flags import Flags, SKIP, TE
-from .objects import get, Null, OK, Fail, Error, Argument
+from .objects import get, Null, OK, Fail, Skip, Error, Argument
 from .constants import name_sep, id_sep
 from .io import TestIO, LogWriter
 from .name import join, depth, match
@@ -234,35 +234,33 @@ class Test(object):
         def dummy(*args, **kwargs):
             pass
 
+        self.caller_test = current_test.object
+        current_test.object = self
+
         if self.flags & SKIP:
             self.trace = sys.gettrace()
             sys.settrace(dummy)
             sys._getframe(1).f_trace = self.__skip__
         else:
-            self.caller_test = current_test.object
-            current_test.object = self
             try:
                 if current_test.main is self:
                     init()
-                self.run_return = self.run()
-                if type(self.run_return) is types.GeneratorType:
-                    next(self.run_return)
+                self.run()
             except (KeyboardInterrupt, Exception):
                 self.trace = sys.gettrace()
                 sys.settrace(dummy)
-                sys._getframe(1).f_trace = self.__nop__
-                self.__exit__(*sys.exc_info(), frame=inspect.currentframe().f_back)
+                sys._getframe(1).f_trace = functools.partial(self.__nop__, *sys.exc_info())
             return self
 
-    def __nop__(self, *args):
+    def __nop__(self, exc_type, exc_value, exc_tb, *args):
         sys.settrace(self.trace)
+        raise exc_value.with_traceback(exc_tb)
 
     def __skip__(self, *args):
-        self.io.close()
         sys.settrace(self.trace)
-        raise skip("skip flag set", test=self)
+        raise ResultException(Skip(self.name, "skip flag set"))
 
-    def __exit__(self, exception_type, exception_value, exception_traceback, frame=None):
+    def __exit__(self, exception_type, exception_value, exception_traceback):
         global current_test
         current_test.object = self.caller_test
 
@@ -278,25 +276,15 @@ class Test(object):
                     self.result = Error(self.name,
                         "unexpected %s: %s" % (exception_type.__name__, str(exception_value).split('\n', 1)[0]))
             else:
-                if type(self.run_return) is types.GeneratorType:
-                    for i in self.run_return:
-                        pass
-
                 if isinstance(self.result, Null):
                     self.result = OK(self.name)
         finally:
             self.io.output.result(self.result)
             self.io.close()
 
-            # main cleanup
-            if current_test.main is self:
-                LogWriter().fd.close()
-
             if not TE in self.flags and not self.result:
-                if frame is None:
-                    frame = inspect.currentframe().f_back
-                if frame.f_locals.get("__name__", frame.f_globals.get("__name__")) == "__main__" \
-                    and depth(self.name) == 1:
+                frame = inspect.currentframe().f_back
+                if main(frame) and depth(self.name) == 1:
                     sys.exit(1)
                 raise ResultException(self.result)
 
