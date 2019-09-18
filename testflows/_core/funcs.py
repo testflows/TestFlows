@@ -68,28 +68,28 @@ def ok(message=None, test=None):
     if test is None:
         test = current_test.object
     test.result = OK(test.name, message)
-    return ResultException(test.result)
+    raise ResultException(test.result)
 
 def fail(message=None, test=None):
     if test is None:
         test = current_test.object
     test.result = Fail(test.name, message)
-    return ResultException(test.result)
+    raise ResultException(test.result)
 
 def skip(message=None, test=None):
     if test is None:
         test = current_test.object
     test.result = Skip(test.name, message)
-    return ResultException(test.result)
+    raise ResultException(test.result)
 
 def error(message=None, test=None):
     if test is None:
         test = current_test.object
     test.result = Error(test.name, message)
-    return ResultException(test.result)
+    raise ResultException(test.result)
 
 def null(test=None):
     if test is None:
         test = current_test.object
     test.result = Null(test.name)
-    return ResultException(test.result)
+    raise ResultException(test.result)

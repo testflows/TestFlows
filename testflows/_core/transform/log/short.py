@@ -14,14 +14,33 @@
 from testflows._core.flags import Flags
 from testflows._core.transform.log import message
 from testflows._core.name import split
+from testflows._core.cli.colors import color
 
 indent = " " * 2
 
+def color_keyword(keyword):
+    return color(split(keyword)[-1], "white", attrs=["dim"])
+
+def color_test_name(name):
+    return color(split(name)[-1], "cyan", attrs=["bold"])
+
+def color_result(result):
+    if result == "OK":
+        return color(result, "green", attrs=["bold"])
+    elif result == "Skip":
+        return color(result, "cyan", attrs=["bold"])
+    # Error, Fail, Null
+    return color(result, "red", attrs=["bold"])
+
 def format_test(msg, keyword):
-    return f"{indent * (msg.p_id.count('/') - 1)}{keyword} {split(msg.name)[-1]} {Flags(msg.flags)}\n"
+    _keyword = color_keyword(keyword)
+    _name = color_test_name(split(msg.name)[-1])
+    return f"{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name} {Flags(msg.flags)}\n"
 
 def format_result(msg, result):
-    return f"{indent * (msg.p_id.count('/') - 1)}{result} {split(msg.test)[-1]}\n"
+    _result = color_result(result)
+    _test = color_test_name(split(msg.test)[-1])
+    return f"{indent * (msg.p_id.count('/') - 1)}{_result} {_test}\n"
 
 formatters = {
     message.RawTest: (format_test, f"Test"),

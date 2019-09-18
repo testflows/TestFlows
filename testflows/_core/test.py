@@ -24,7 +24,7 @@ import testflows.settings as settings
 
 from .exceptions import DummyTestException, ArgumentError, ResultException
 from .flags import Flags, SKIP, TE
-from .objects import get, Null, Argument
+from .objects import get, Null, OK, Fail, Error, Argument
 from .constants import name_sep, id_sep
 from .io import TestIO, LogWriter
 from .name import join, depth, match
@@ -266,42 +266,41 @@ class Test(object):
         global current_test
         current_test.object = self.caller_test
 
-        if exception_value:
-            if isinstance(exception_value, ResultException):
-                self.result = exception_value.result
-            elif isinstance(exception_value, AssertionError):
-                exception(test=self)
-                fail(str(exception_value).split('\n', 1)[0], test=self)
+        try:
+            if exception_value:
+                if isinstance(exception_value, ResultException):
+                    self.result = exception_value.result
+                elif isinstance(exception_value, AssertionError):
+                    exception(test=self)
+                    self.result = Fail(self.name, str(exception_value).split('\n', 1)[0])
+                else:
+                    exception(test=self)
+                    self.result = Error(self.name,
+                        "unexpected %s: %s" % (exception_type.__name__, str(exception_value).split('\n', 1)[0]))
             else:
-                exception(test=self)
-                error("unexpected %s: %s" % (exception_type.__name__, str(exception_value).split('\n', 1)[0]),
-                      test=self)
+                if type(self.run_return) is types.GeneratorType:
+                    for i in self.run_return:
+                        pass
 
+                if isinstance(self.result, Null):
+                    self.result = OK(self.name)
+        finally:
             self.io.output.result(self.result)
+            self.io.close()
+
+            # main cleanup
+            if current_test.main is self:
+                LogWriter().fd.close()
 
             if not TE in self.flags and not self.result:
                 if frame is None:
                     frame = inspect.currentframe().f_back
-                if frame.f_locals.get("__name__", frame.f_globals.get("__name__")) == "__main__" and depth(
-                        self.name) == 1:
+                if frame.f_locals.get("__name__", frame.f_globals.get("__name__")) == "__main__" \
+                    and depth(self.name) == 1:
                     sys.exit(1)
                 raise ResultException(self.result)
 
-            return True
-
-        if type(self.run_return) is types.GeneratorType:
-            for i in self.run_return:
-                pass
-
-        if not self.result:
-            ok(test=self)
-
-        self.io.output.result(self.result)
-        self.io.close()
-
-        # main cleanup
-        if current_test.main is self:
-            LogWriter().fd.close()
+        return True
 
     def init(self, **args):
         pass
