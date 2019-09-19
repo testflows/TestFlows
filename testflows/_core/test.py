@@ -170,7 +170,7 @@ class Test(object):
         self.start_time = time.time()
         self.parent = parent
         self.id = get(id, [settings.test_id])
-        self.name = get(name, self.name)
+        self.name = name % {"name": self.name} if name is not None else self.name
 
         if self.name is None:
             raise TypeError("name must be specified")
