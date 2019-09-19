@@ -48,7 +48,7 @@ def format_test(msg, keyword):
 def format_result(msg, result):
     _result = color_result(result)
     _test = color_other(split(msg.test)[-1])
-    return color_other(f"{strftimedelta(msg.p_time):>20}") + f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_result} {_test}\n"
+    return color_other(f"{strftimedelta(msg.p_time):>20}") + f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_result} {_test}{color_other((', ' + msg.message) if msg.message else '')}\n"
 
 def format_other(msg, keyword):
     fields = ' '.join([str(f) for f in msg[message.Prefix.time + 1:]])

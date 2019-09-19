@@ -23,7 +23,7 @@ import importlib
 import testflows.settings as settings
 
 from .exceptions import DummyTestException, ArgumentError, ResultException
-from .flags import Flags, SKIP, TE
+from .flags import Flags, SKIP, TE, FAIL_NOT_COUNTED, ERROR_NOT_COUNTED, NULL_NOT_COUNTED
 from .objects import get, Null, OK, Fail, Skip, Error, Argument
 from .constants import name_sep, id_sep
 from .io import TestIO, LogWriter
@@ -154,7 +154,7 @@ class Test(object):
 
     def __init__(self, name=None, flags=None, uid=None, tags=None, attributes=None, requirements=None,
                  users=None, tickets=None, description=None, parent=None,
-                 only=None, start=None, end=None, args=None, id=None, _frame=None):
+                 only=None, start=None, end=None, args=None, id=None):
         global current_test
 
         cli_args = {}
@@ -162,9 +162,7 @@ class Test(object):
             if current_test.main is not None:
                 raise RuntimeError("only one top level test is allowed")
             current_test.main = self
-            frame = _frame
-            if frame is None:
-                frame = inspect.currentframe().f_back
+            frame = inspect.currentframe().f_back.f_back
             if main(frame):
                 cli_args = self.parse_cli_args()
 
@@ -231,34 +229,16 @@ class Test(object):
         self.io = TestIO(self)
         self.io.output.test_message()
 
-        def dummy(*args, **kwargs):
-            pass
-
         self.caller_test = current_test.object
         current_test.object = self
 
         if self.flags & SKIP:
-            self.trace = sys.gettrace()
-            sys.settrace(dummy)
-            sys._getframe(1).f_trace = self.__skip__
+            raise ResultException(Skip(self.name, "skip flag set"))
         else:
-            try:
-                if current_test.main is self:
-                    init()
-                self.run()
-            except (KeyboardInterrupt, Exception):
-                self.trace = sys.gettrace()
-                sys.settrace(dummy)
-                sys._getframe(1).f_trace = functools.partial(self.__nop__, *sys.exc_info())
+            if current_test.main is self:
+                init()
+            self.run()
             return self
-
-    def __nop__(self, exc_type, exc_value, exc_tb, *args):
-        sys.settrace(self.trace)
-        raise exc_value.with_traceback(exc_tb)
-
-    def __skip__(self, *args):
-        sys.settrace(self.trace)
-        raise ResultException(Skip(self.name, "skip flag set"))
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
         global current_test
@@ -281,12 +261,6 @@ class Test(object):
         finally:
             self.io.output.result(self.result)
             self.io.close()
-
-            if not TE in self.flags and not self.result:
-                frame = inspect.currentframe().f_back
-                if main(frame) and depth(self.name) == 1:
-                    sys.exit(1)
-                raise ResultException(self.result)
 
         return True
 
@@ -319,33 +293,85 @@ class Test(object):
         return self.io.message_io(name=name)
 
 
-def test(*args, **kwargs):
-    parent = kwargs.pop("parent", None) or current_test.object
-    TestClass = kwargs.pop("testclass", None) or Test
+class test(object):
+    """Test runner.
 
-    callargs = inspect.getcallargs(TestClass.__init__, None, *args, **kwargs)
-    callargs.pop('self')
-
-    if parent:
-        callargs["parent"] = parent.name
-        callargs["id"] = parent.id + [parent.child_count]
-        parent.child_count += 1
-
-    if not parent and not current_test.main:
-        callargs["_frame"] = inspect.currentframe().f_back
-
-    return TestClass(**callargs)
-
-def run(path, test=None, *args, **kwargs):
-    """Run a test case specified by module path
-    and optional test class or method.
-
-    :param path: test case module path
-    :param test: test case object, default: None
-    :param *args: *args
-    :param **kwargs: **kwargs
+    :param name: name of the test
+    :param test: test class (optional), default: Test
+    :param **kwargs: test class arguments
     """
-    module = importlib.import_module(path)
+    def __init__(self, name, **kwargs):
+        parent = kwargs.pop("parent", None) or current_test.object
+        test = kwargs.pop("test", None)
+
+        test = test if test is not None else Test
+
+        if parent:
+            kwargs["parent"] = parent.name
+            kwargs["id"] = parent.id + [parent.child_count]
+            parent.child_count += 1
+
+        self.parent = parent
+        self.test = test(name, **kwargs)
+
+    def __enter__(self):
+        def dummy(*args, **kwargs):
+            pass
+        try:
+            return self.test.__enter__()
+        except (KeyboardInterrupt, Exception):
+            self.trace = sys.gettrace()
+            sys.settrace(dummy)
+            sys._getframe(1).f_trace = functools.partial(self.__nop__, *sys.exc_info())
+
+    def __nop__(self, exc_type, exc_value, exc_tb, *args):
+        sys.settrace(self.trace)
+        raise exc_value.with_traceback(exc_tb)
+
+    def __exit__(self, exception_type, exception_value, exception_traceback):
+        try:
+            test__exit__ = self.test.__exit__(exception_type, exception_value, exception_traceback)
+        except (KeyboardInterrupt, Exception):
+            raise
+
+        # if test did not handle the exception in __exit__ then re-raise it
+        if exception_value and not test__exit__:
+            raise exception_value.with_traceback(exception_traceback)
+
+        if not self.test.result:
+            if not self.parent:
+                sys.exit(1)
+
+            if isinstance(self.test.result, Fail):
+                result = Fail(self.parent.name, self.test.result.message)
+            else:
+                # convert Null into an Error
+                result = Error(self.parent.name, self.test.result.message)
+
+            if TE not in self.test.flags:
+                raise ResultException(result)
+            else:
+                if isinstance(self.parent.result, Error):
+                    pass
+                elif isinstance(self.test.result, Error) and ERROR_NOT_COUNTED not in self.test.flags:
+                    self.parent.result = result
+                elif isinstance(self.test.result, Null) and NULL_NOT_COUNTED not in self.test.flags:
+                    self.parent.result = result
+                elif isinstance(self.parent.result, Fail):
+                    pass
+                elif isinstance(self.test.result, Fail) and FAIL_NOT_COUNTED not in self.test.flags:
+                    self.parent.result = result
+                else:
+                    pass
+        return True
+
+def load(module, test=None):
+    """Load test from module path.
+
+    :param module: module path
+    :param test: test class or method to load (optional)
+    """
+    module = importlib.import_module(module)
     if test:
         test = getattr(module, test, None)
     if test is None:
@@ -354,15 +380,29 @@ def run(path, test=None, *args, **kwargs):
         test = getattr(module, "TestSuite", None)
     if test is None:
         test = getattr(module, "Test", None)
+    return test
 
-    callargs = inspect.getcallargs(test.__init__, None, *args, **kwargs)
-    callargs.pop('self')
+def run(test, **kwargs):
+    """Run a test.
 
-    name = callargs["name"]
-    if name:
-        callargs["name"] = name % {"name": test.name}
+    :param test: test class, test function or test module path
+    :param cls: if test is a module path, cls can
+       specify test definition to load (optional)
+    """
+    cls = kwargs.pop("cls", None)
 
-    with globals()["test"](**callargs, testclass=test):
+    if inspect.isclass(test) and issubclass(test, Test):
+        test = test
+    elif issubclass(test, str):
+        return run(load(test, cls), **kwargs)
+    elif inspect.isfunction(test):
+        return test(**kwargs)
+    elif inspect.ismethod(test):
+        return test(**kwargs)
+    else:
+        raise TypeError(f"invalid test type '{type(test)}'")
+
+    with globals()["test"](test=test, **kwargs) as test:
         pass
 
-
+    return test.result

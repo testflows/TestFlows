@@ -12,38 +12,65 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # to the end flag
-TE     = 1 << 0
+TE = 1 << 0
 # utility test flag
-UT     = 1 << 1
+UT = 1 << 1
 # skip flag
-SKIP   = 1 << 2
+SKIP = 1 << 2
 # expected OK
-EOK    = 1 << 3
+EOK = 1 << 3
 # expected Fail
-EFAIL  = 1 << 4
+EFAIL = 1 << 4
 # expected Error
 EERROR = 1 << 5 
 # expected Skip
-ESKIP  = 1 << 6
+ESKIP = 1 << 6
+# crossed out ok
+XOK = 1 << 7
+# crossed out fail
+XFAIL = 1 << 8
+# crossed out error
+XERROR = 1 << 9
+# crossed out null
+XNULL = 1 << 10
+# not counted fail
+FAIL_NOT_COUNTED = 1 << 11
+# not counted error
+ERROR_NOT_COUNTED = 1 << 12
+# not counted null
+NULL_NOT_COUNTED = 1 << 13
 # report flag
-REP    = 1 << 7  
+REP = 1 << 26
 # documentation
-DOC    = 1 << 8
+DOC = 1 << 27
 # mandatory test
-MAN    = 1 << 9
+MAN = 1 << 28
 # clear flags mask
-CLR    = 1 << 31
+CLR = 1 << 31
 # expected result
 ERESULT = EOK | EFAIL | ESKIP | EERROR 
 # expected any result
-EANY    = EOK | EFAIL | ESKIP
+EANY = EOK | EFAIL | ESKIP
+# crossed out result
+XRESULT = XOK | XFAIL | XERROR | XNULL
+# not counted
+NOT_COUNTED = FAIL_NOT_COUNTED
+NOT_COUNTED_ANY = FAIL_NOT_COUNTED | ERROR_NOT_COUNTED | NULL_NOT_COUNTED
 
 class Flags(object):
-    '''Test flags.
-    '''
-    all     = [ TE, UT, SKIP, EOK, EFAIL, EERROR, ESKIP, REP, DOC, MAN, CLR]
-    all_str = ["TE", "UT", "SKIP", "EOK", "EFAIL", "EERROR", "ESKIP",
-        "REP", "DOC", "MAN", "CLR"]
+    """Test flags."""
+    all = [
+            TE, UT, SKIP, EOK, EFAIL, EERROR, ESKIP,
+            XOK, XFAIL, XERROR, XNULL,
+            FAIL_NOT_COUNTED, ERROR_NOT_COUNTED, NULL_NOT_COUNTED,
+            REP, DOC, MAN, CLR
+        ]
+    all_str = [
+            "TE", "UT", "SKIP", "EOK", "EFAIL", "EERROR", "ESKIP",
+            "XOK", "XFAIL", "XERROR", "XNULL",
+            "FAIL_NOT_COUNTED", "ERROR_NOT_COUNTED", "NULL_NOT_COUNTED",
+            "REP", "DOC", "MAN", "CLR"
+        ]
     
     def __init__(self, flags=0):
         if flags is None:
