@@ -393,7 +393,7 @@ def run(test, **kwargs):
 
     if inspect.isclass(test) and issubclass(test, Test):
         test = test
-    elif issubclass(test, str):
+    elif type(test) is str:
         return run(load(test, cls), **kwargs)
     elif inspect.isfunction(test):
         return test(**kwargs)
@@ -402,7 +402,7 @@ def run(test, **kwargs):
     else:
         raise TypeError(f"invalid test type '{type(test)}'")
 
-    with globals()["test"](test=test, **kwargs) as test:
+    with globals()["test"](test=test, name=kwargs.pop("name", None), **kwargs) as test:
         pass
 
     return test.result
