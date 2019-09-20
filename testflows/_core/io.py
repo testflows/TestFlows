@@ -36,9 +36,11 @@ class TestOutput(object):
         self.msg_hash = ""
         self.msg_count = 0
         self.prefix = dumps([
+            int(self.test.type),
             id_sep + id_sep.join(str(n) for n in self.test.id),
             self.test.name,
             int(self.test.flags),
+            int(self.test.cflags)
         ])[1:-1]
 
     def message(self, keyword, message, rtime=None, stream=None):

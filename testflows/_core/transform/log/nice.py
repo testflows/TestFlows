@@ -14,7 +14,8 @@
 import re
 import textwrap
 
-from testflows._core.flags import Flags, TEST_TYPE, MODULE, SUITE, TEST, STEP
+from testflows._core.flags import Flags
+from testflows._core.testtype import TestType
 from testflows._core.transform.log import message
 from testflows._core.utils.timefuncs import strftime, strftimedelta
 from testflows._core.utils.timefuncs import localfromtimestamp
@@ -40,15 +41,12 @@ def color_result(result):
 
 def format_test(msg, keyword):
     flags = Flags(msg.flags)
-    test_type = flags & TEST_TYPE
-    # clear TEST_TYPE from flags
-    flags &= ~TEST_TYPE
 
-    if test_type == MODULE:
+    if msg.p_type == TestType.Module:
         keyword += "Module"
-    elif test_type == SUITE:
+    elif msg.p_type == TestType.Suite:
         keyword += "Suite"
-    elif test_type == STEP:
+    elif msg.p_type == TestType.Step:
         keyword += "Step"
     else:
         keyword += "Test"

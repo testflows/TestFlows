@@ -39,14 +39,6 @@ FAIL_NOT_COUNTED = 1 << 11
 ERROR_NOT_COUNTED = 1 << 12
 # not counted null
 NULL_NOT_COUNTED = 1 << 13
-# module flag
-MODULE = 0x1 << 23
-# suite flag
-SUITE = 0x1 << 22
-# test flag
-TEST = 0x1 << 21
-# step flag
-STEP = 0x1 << 20
 # report flag
 REP = 1 << 26
 # documentation
@@ -64,8 +56,8 @@ XRESULT = XOK | XFAIL | XERROR | XNULL
 # not counted
 NOT_COUNTED = FAIL_NOT_COUNTED
 NOT_COUNTED_ANY = FAIL_NOT_COUNTED | ERROR_NOT_COUNTED | NULL_NOT_COUNTED
-# test type
-TEST_TYPE = MODULE | SUITE | TEST | STEP
+# cumulative flags
+CFLAGS = UT
 
 class Flags(object):
     """Test flags."""
@@ -73,14 +65,12 @@ class Flags(object):
             TE, UT, SKIP, EOK, EFAIL, EERROR, ESKIP,
             XOK, XFAIL, XERROR, XNULL,
             FAIL_NOT_COUNTED, ERROR_NOT_COUNTED, NULL_NOT_COUNTED,
-            MODULE, SUITE, TEST, STEP,
             REP, DOC, MAN, CLR
         ]
     all_str = [
             "TE", "UT", "SKIP", "EOK", "EFAIL", "EERROR", "ESKIP",
             "XOK", "XFAIL", "XERROR", "XNULL",
             "FAIL_NOT_COUNTED", "ERROR_NOT_COUNTED", "NULL_NOT_COUNTED",
-            "MODULE", "SUITE", "TEST", "STEP",
             "REP", "DOC", "MAN", "CLR"
         ]
     

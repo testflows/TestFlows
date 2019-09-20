@@ -24,7 +24,8 @@ import testflows.settings as settings
 
 from .exceptions import DummyTestException, ArgumentError, ResultException
 from .flags import Flags, SKIP, TE, FAIL_NOT_COUNTED, ERROR_NOT_COUNTED, NULL_NOT_COUNTED
-from .flags import MODULE, SUITE, TEST, STEP, TEST_TYPE
+from .flags import CFLAGS
+from .testtype import TestType
 from .objects import get, Null, OK, Fail, Skip, Error, Argument
 from .constants import name_sep, id_sep
 from .io import TestIO, LogWriter
@@ -153,7 +154,8 @@ class Test(object):
                 sys.exit(1)
         return args
 
-    def __init__(self, name=None, flags=None, uid=None, tags=None, attributes=None, requirements=None,
+    def __init__(self, name=None, flags=None, cflags=None, type=None,
+                 uid=None, tags=None, attributes=None, requirements=None,
                  users=None, tickets=None, description=None, parent=None,
                  only=None, start=None, end=None, args=None, id=None):
         global current_test
@@ -190,6 +192,8 @@ class Test(object):
         self.result = Null(self.name)
         if flags is not None:
             self.flags = Flags(flags)
+        self.type = get(type, TestType.Test)
+        self.cflags = Flags(cflags) | (self.flags & CFLAGS)
         self.uid = get(uid, self.uid)
 
         self.only = [o.at(self.name) for o in get(only, [])]
@@ -309,27 +313,24 @@ class _test(object):
         if parent:
             kwargs["parent"] = parent.name
             kwargs["id"] = parent.id + [parent.child_count]
+            kwargs["cflags"] = parent.cflags
             # handle parent test type propagation
-            self._parent_test_type_propagation(parent, kwargs)
+            self._parent_type_propagation(parent, kwargs)
             parent.child_count += 1
 
         self.parent = parent
         self.test = test(name, **kwargs)
 
-    def _parent_test_type_propagation(self, parent, kwargs):
+    def _parent_type_propagation(self, parent, kwargs):
         """Propagate parent test type if lower.
 
         :param parent: parent
         :param kwargs: test's kwargs
         """
-        parent_type = parent.flags & TEST_TYPE
-        flags = Flags(kwargs.pop("flags", None))
-        test_type = flags & TEST_TYPE
-
-        if int(parent_type) < int(test_type):
-            test_type = parent_type
-
-        kwargs["flags"] = (flags & ~TEST_TYPE) | test_type
+        type = kwargs.pop("type", TestType.Test)
+        if int(parent.type) < int(type):
+            type = parent.type
+        kwargs["type"] = type
 
     def __enter__(self):
         def dummy(*args, **kwargs):
@@ -385,26 +386,26 @@ class _test(object):
 class module(_test):
     """Module definition."""
     def __init__(self, name, **kwargs):
-        flags = (Flags(kwargs.pop("flags", None)) & ~TEST_TYPE) | MODULE
-        return super(module, self).__init__(name, flags=flags, **kwargs)
+        kwargs["type"] = TestType.Module
+        return super(module, self).__init__(name, **kwargs)
 
 class suite(_test):
     """Suite definition."""
     def __init__(self, name, **kwargs):
-        flags = (Flags(kwargs.pop("flags", None)) & ~TEST_TYPE) | SUITE
-        return super(suite, self).__init__(name, flags=flags, **kwargs)
+        kwargs["type"] = TestType.Suite
+        return super(suite, self).__init__(name, **kwargs)
 
 class test(_test):
     """Test definition."""
     def __init__(self, name, **kwargs):
-        flags = (Flags(kwargs.pop("flags", None)) & ~TEST_TYPE) | TEST
-        return super(test, self).__init__(name, flags=flags, **kwargs)
+        kwargs["type"] = TestType.Test
+        return super(test, self).__init__(name, **kwargs)
 
 class step(_test):
     """Step definition."""
     def __init__(self, name, **kwargs):
-        flags = (Flags(kwargs.pop("flags", None)) & ~TEST_TYPE) | STEP
-        return super(step, self).__init__(name, flags=flags, **kwargs)
+        kwargs["type"] = TestType.Step
+        return super(step, self).__init__(name, **kwargs)
 
 def load(module, test=None):
     """Load test from module path.
