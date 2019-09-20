@@ -14,7 +14,7 @@
 import re
 import textwrap
 
-from testflows._core.flags import Flags
+from testflows._core.flags import Flags, TEST_TYPE, MODULE, SUITE, TEST, STEP
 from testflows._core.transform.log import message
 from testflows._core.utils.timefuncs import strftime, strftimedelta
 from testflows._core.utils.timefuncs import localfromtimestamp
@@ -39,10 +39,24 @@ def color_result(result):
     return color(result, "red", attrs=["bold"])
 
 def format_test(msg, keyword):
+    flags = Flags(msg.flags)
+    test_type = flags & TEST_TYPE
+    # clear TEST_TYPE from flags
+    flags &= ~TEST_TYPE
+
+    if test_type == MODULE:
+        keyword += "Module"
+    elif test_type == SUITE:
+        keyword += "Suite"
+    elif test_type == STEP:
+        keyword += "Step"
+    else:
+        keyword += "Test"
+
     started = strftime(localfromtimestamp(msg.started))
     _keyword = color_keyword(keyword)
     _name = color_other(split(msg.name)[-1])
-    out = color_other(f"{started:>20}") + f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name}{color_other(', flags:' + str(Flags(msg.flags)) if msg.flags else '')}\n"
+    out = color_other(f"{started:>20}") + f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name}{color_other(', flags:' + str(flags) if flags else '')}\n"
     return out
 
 def format_result(msg, result):
@@ -65,7 +79,7 @@ mark = "\u27e5"
 result_mark = "\u27e5\u27e4"
 
 formatters = {
-    message.RawTest: (format_test, f"{mark}  Test"),
+    message.RawTest: (format_test, f"{mark}  "),
     message.RawDescription: (format_other, f"{mark}    :"),
     message.RawArgument: (format_other, f"{mark}    @"),
     message.RawAttribute: (format_other, f"{mark}    -"),

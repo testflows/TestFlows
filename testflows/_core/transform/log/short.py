@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from testflows._core.flags import Flags
+from testflows._core.flags import Flags, TEST_TYPE, MODULE, SUITE, TEST, STEP
 from testflows._core.transform.log import message
 from testflows._core.name import split
 from testflows._core.cli.colors import color
@@ -33,6 +33,16 @@ def color_result(result):
     return color(result, "red", attrs=["bold"])
 
 def format_test(msg, keyword):
+    test_type = Flags(msg.flags) & TEST_TYPE
+    if test_type == MODULE:
+        keyword += "Module"
+    elif test_type == SUITE:
+        keyword += "Suite"
+    elif test_type == STEP:
+        keyword += "Step"
+    else:
+        keyword += "Test"
+
     _keyword = color_keyword(keyword)
     _name = color_test_name(split(msg.name)[-1])
     return f"{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name}\n"
@@ -42,7 +52,7 @@ def format_result(msg, result):
     return f"{indent * (msg.p_id.count('/') - 1)}{_result}\n"
 
 formatters = {
-    message.RawTest: (format_test, f"Test"),
+    message.RawTest: (format_test, f""),
     message.RawResultOK: (format_result, f"OK"),
     message.RawResultFail: (format_result, f"Fail"),
     message.RawResultError: (format_result, f"Error"),
