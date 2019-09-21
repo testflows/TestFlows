@@ -19,6 +19,7 @@ from testflows._core.contrib.arpeggio import ParserPython as PEGParser
 from testflows._core.contrib.arpeggio import PTNodeVisitor, visit_parse_tree
 
 class Visitor(PTNodeVisitor):
+    # FIXME: add support for alternative headers H2 "-" and H1 "="
     def __init__(self, *args, **kwargs):
         self.header_ids = {}
         self.levels = []
@@ -41,6 +42,12 @@ class Visitor(PTNodeVisitor):
         self.levels[self.current_level-1] += 1
         name = node.heading_name.value
         anchor = re.sub(r"\s+", "-", re.sub(r"[^a-zA-Z0-9-_\s]+", "", name.lower()))
+        # handle duplicate header ids
+        if self.header_ids.get(anchor) is None:
+            self.header_ids[anchor] = 1
+        else:
+            anchor = f"{anchor}{str(self.header_ids[anchor])}"
+            self.header_ids[anchor] += 1
         indent = "  " * (level - 1)
         self.output.append(f"{indent}* {'.'.join([str(l) for l in self.levels[:self.current_level]])} [{name}](#{anchor})")
 
@@ -59,15 +66,8 @@ def Parser():
     def heading():
         return [
             (_(r"\s*#+\s+"), heading_name, _(r"\n?")),
-            (heading_name, heading_alt_level, _(r"\n?"))
+            (heading_name, _(r"\n?[-=]+\n?"))
         ]
-
-
-    def heading_level():
-        return _(r"#")
-
-    def heading_alt_level():
-        return _(r"\n?[-=]+")
 
     def heading_name():
         return _(r"[^\n]+")
