@@ -96,7 +96,7 @@ class Attribute(TestObject):
         return super(Attribute, self).__init__()
 
 class Requirement(TestObject):
-    _fields = ("name", "revision", "description",
+    _fields = ("name", "version", "description",
             "link", "priority", "type", "group", "uid")
     _defaults = (None,) * 6
     uid = None
@@ -105,10 +105,10 @@ class Requirement(TestObject):
     type = None
     group = None
     
-    def __init__(self, name, revision, description=None, link=None,  
+    def __init__(self, name, version, description=None, link=None,
             priority=None, type=None, group=None, uid=None):
         self.name = name
-        self.revision = revision
+        self.version = version
         self.description = get(description, self.__doc__)
         self.link = get(link, self.link)
         self.priority = get(priority, self.priority)
@@ -117,9 +117,9 @@ class Requirement(TestObject):
         self.uid = get(uid, self.uid)
         return super(Requirement, self).__init__()  
 
-    def __call__(self, *revision):
-        if not self.revision in revision:
-            raise RequirementError("requirement revision %s is not in %s" % (self.revision, list(revision)))
+    def __call__(self, *version):
+        if not self.version in version:
+            raise RequirementError("requirement version %s is not in %s" % (self.version, list(version)))
         return self
 
 class Measurement(TestObject):
