@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from testflows._core.cli.arg.common import epilog
-from testflows._core.cli.arg.common import RawDescriptionHelpFormatter
+from testflows._core.cli.arg.common import HelpFormatter
 from testflows._core.cli.arg.handlers.handler import Handler as HandlerBase
 from testflows._core.cli.arg.handlers.document.toc import Handler as toc_handler
 
@@ -21,7 +21,7 @@ class Handler(HandlerBase):
     def add_command(cls, commands):
         parser = commands.add_parser("document", help="document processing", epilog=epilog(),
             description="Work with documents.",
-            formatter_class=RawDescriptionHelpFormatter)
+            formatter_class=HelpFormatter)
 
         document_commands = parser.add_subparsers(title="commands", metavar="command",
             description=None, help=None)

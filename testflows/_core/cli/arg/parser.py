@@ -17,7 +17,7 @@ from argparse import ArgumentParser as ArgumentParserBase
 
 from .common import epilog
 from .common import description
-from .common import RawDescriptionHelpFormatter
+from .common import HelpFormatter
 from .handlers.log.handler import Handler as log_handler
 from .handlers.document.handler import Handler as document_handler
 from .handlers.requirement.handler import Handler as requirement_handler
@@ -29,12 +29,12 @@ class ArgumentParser(ArgumentParserBase):
         description_prog = kwargs.pop("description_prog", None)
         kwargs["epilog"] = kwargs.pop("epilog", epilog())
         kwargs["description"] = description(textwrap.dedent(kwargs.pop("description", "")), prog=description_prog)
-        kwargs["formatter_class"] = kwargs.pop("formatter_class", RawDescriptionHelpFormatter)
+        kwargs["formatter_class"] = kwargs.pop("formatter_class", HelpFormatter)
         return super(ArgumentParser, self).__init__(*args, **kwargs)
 
 parser = ArgumentParser(prog="tfs")
 
 commands = parser.add_subparsers(title='commands', metavar='command', description=None, help=None)
 log_handler.add_command(commands)
-document_handler.add_command(commands)
 requirement_handler.add_command(commands)
+document_handler.add_command(commands)

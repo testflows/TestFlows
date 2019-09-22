@@ -11,13 +11,49 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import argparse
 import functools
 
 from datetime import datetime
-from argparse import RawDescriptionHelpFormatter
+from argparse import RawDescriptionHelpFormatter as HelpFormatterBase
 
 from testflows._core import __version__
 from testflows._core.cli.colors import color, white, blue, cyan
+
+class HelpFormatter(HelpFormatterBase):
+    """
+    Corrected _max_action_length for the indenting of subactions
+    """
+    def __init__(self,
+            prog,
+            indent_increment=2,
+            max_help_position=50,
+            width=100):
+        super(HelpFormatter, self).__init__(prog=prog, indent_increment=indent_increment,
+            max_help_position=max_help_position, width=width)
+
+    def add_argument(self, action):
+        if action.help is not argparse.SUPPRESS:
+
+            # find all invocations
+            get_invocation = self._format_action_invocation
+            invocations = [get_invocation(action)]
+            current_indent = self._current_indent
+            for subaction in self._iter_indented_subactions(action):
+                # compensate for the indent that will be added
+                indent_chg = self._current_indent - current_indent
+                added_indent = 'x'*indent_chg
+                invocations.append(added_indent+get_invocation(subaction))
+            # print('inv', invocations)
+
+            # update the maximum item length
+            invocation_length = max([len(s) for s in invocations])
+            action_length = invocation_length + self._current_indent
+            self._action_max_length = max(self._action_max_length,
+                                          action_length)
+
+            # add the item to the list
+            self._add_item(self._format_action, [action])
 
 def description(description=None, prog=None, version=None):
     if version is None:
