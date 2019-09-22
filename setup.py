@@ -30,10 +30,12 @@ setup(
         "testflows._core.utils",
         "testflows._core.transform",
         "testflows._core.transform.log",
+        "testflows._core.document",
         "testflows._core.cli",
         "testflows._core.cli.arg",
         "testflows._core.cli.arg.handlers",
-        "testflows._core.cli.arg.handlers.log"
+        "testflows._core.cli.arg.handlers.log",
+        "testflows._core.cli.arg.handlers.document"
         ],
     scripts=[
         "testflows/_core/bin/tfs",

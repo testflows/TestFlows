@@ -13,7 +13,7 @@
 # limitations under the License.
 from testflows._core.cli.arg.common import epilog
 from testflows._core.cli.arg.common import RawDescriptionHelpFormatter
-from testflows._core.cli.arg.handlers import Handler as HandlerBase
+from testflows._core.cli.arg.handlers.handler import Handler as HandlerBase
 from testflows._core.cli.arg.handlers.log.nice import Handler as nice_handler
 from testflows._core.cli.arg.handlers.log.short import Handler as short_handler
 

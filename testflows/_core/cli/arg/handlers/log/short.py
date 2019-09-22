@@ -11,13 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from argparse import FileType
-
 import testflows._core.cli.arg.type as argtype
 
 from testflows._core.cli.arg.common import epilog
 from testflows._core.cli.arg.common import RawDescriptionHelpFormatter
-from testflows._core.cli.arg.handlers import Handler as HandlerBase
+from testflows._core.cli.arg.handlers.handler import Handler as HandlerBase
 from testflows._core.transform.log.pipeline import ShortLogPipeline
 
 class Handler(HandlerBase):

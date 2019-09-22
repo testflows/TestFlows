@@ -11,3 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+class Handler(object):
+    def __init__(self):
+        pass
+
+    def __call__(self, args):
+        return self.handle(args)
+
+    @classmethod
+    def add_arguments(cls, parser):
+        pass
+
+    @classmethod
+    def add_command(self, commands):
+        raise NotImplementedError
+
+    def handle(self):
+        pass
