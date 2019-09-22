@@ -20,6 +20,7 @@ from .common import description
 from .common import RawDescriptionHelpFormatter
 from .handlers.log.handler import Handler as log_handler
 from .handlers.document.handler import Handler as document_handler
+from .handlers.requirement.handler import Handler as requirement_handler
 
 class ArgumentParser(ArgumentParserBase):
     """Customized argument parser.
@@ -36,3 +37,4 @@ parser = ArgumentParser(prog="tfs")
 commands = parser.add_subparsers(title='commands', metavar='command', description=None, help=None)
 log_handler.add_command(commands)
 document_handler.add_command(commands)
+requirement_handler.add_command(commands)

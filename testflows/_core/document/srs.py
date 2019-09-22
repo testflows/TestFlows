@@ -12,14 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import re
-import textwrap
 
 from testflows._core.contrib.arpeggio import RegExMatch as _
 from testflows._core.contrib.arpeggio import OneOrMore, ZeroOrMore, EOF, Optional, Not
 from testflows._core.contrib.arpeggio import ParserPython as PEGParser
 from testflows._core.contrib.arpeggio import PTNodeVisitor, visit_parse_tree
-
-from testflows.core import Requirement
 
 template = """
 %(pyname)s = Requirement(
@@ -32,11 +29,18 @@ template = """
         description=%(description)s,
         link=%(link)s
     )
+
 """
 
 class Visitor(PTNodeVisitor):
     def __init__(self, *args, **kwargs):
-        self.output = "# Auto generated requirements"
+        self.output = (
+            "# These are auto generated requirements from an SRS document.\n"
+            "# Do not edit by hand but re-generate instead\n"
+            "# using \"tfs requirement generate\" command.\n"
+            "#\n"
+            "from testflows.core import Requirement\n\n"
+            )
         self.pyname_fmt = re.compile(r"[^a-zA-Z0-9]")
         super(Visitor, self).__init__(*args, **kwargs)
 
@@ -75,7 +79,7 @@ class Visitor(PTNodeVisitor):
         except:
             pass
 
-        self.output += template % {
+        self.output += template.lstrip() % {
             "pyname": pyname,
             "name": node.requirement_heading.requirement_name.value,
             "version": node.version.word,
@@ -88,7 +92,7 @@ class Visitor(PTNodeVisitor):
         }
 
     def visit_document(self, node, children):
-        return self.output
+        return self.output.rstrip() + "\n"
 
 def Parser():
     """Returns markdown requirements parser.
@@ -155,7 +159,6 @@ def generate(source, destination):
     """
     parser = Parser()
     source_data = source.read()
-    print(source_data)
     tree = parser.parse(source_data)
     destination_data = visit_parse_tree(tree, Visitor())
     if destination_data:
