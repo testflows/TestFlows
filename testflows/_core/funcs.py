@@ -18,6 +18,7 @@ from .exceptions import ResultException
 from .serialize import dumps
 from .message import Message
 from .objects import OK, Fail, Error, Skip, Null
+from .objects import XOK, XFail, XError, XNull
 
 #: current test handle
 current_test = threading.local()
@@ -92,4 +93,28 @@ def null(test=None):
     if test is None:
         test = current_test.object
     test.result = Null(test.name)
+    raise ResultException(test.result)
+
+def xok(message=None, test=None):
+    if test is None:
+        test = current_test.object
+    test.result = XOK(test.name, message)
+    raise ResultException(test.result)
+
+def xfail(message=None, test=None):
+    if test is None:
+        test = current_test.object
+    test.result = XFail(test.name, message)
+    raise ResultException(test.result)
+
+def xerror(message=None, test=None):
+    if test is None:
+        test = current_test.object
+    test.result = XError(test.name, message)
+    raise ResultException(test.result)
+
+def xnull(test=None):
+    if test is None:
+        test = current_test.object
+    test.result = XNull(test.name)
     raise ResultException(test.result)
