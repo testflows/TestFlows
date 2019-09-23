@@ -78,6 +78,18 @@ class ErrorMessage(ResultMessage):
 class NullMessage(ResultMessage):
     pass
 
+class XOKMessage(ResultMessage):
+    pass
+
+class XFailMessage(ResultMessage):
+    pass
+
+class XErrorMessage(ResultMessage):
+    pass
+
+class XNullMessage(ResultMessage):
+    pass
+
 class Prefix(object):
     __slots__ = ()
     fields = "p_keyword p_hash p_num p_type p_id p_name p_flags p_cflags p_stream p_time "
@@ -143,21 +155,45 @@ class RawResultFail(RawFormat, FailMessage, namedtuple_with_defaults(
     pass
 
 class RawResultSkip(RawFormat, SkipMessage, namedtuple_with_defaults(
-        "RawResultSKIPMessage",
+        "RawResultSkipMessage",
         RawFormat.prefix.fields + " ".join(objects.Skip._fields),
         defaults=objects.Skip._defaults)):
     pass
 
 class RawResultError(RawFormat, ErrorMessage, namedtuple_with_defaults(
-        "RawResultERRORMessage",
+        "RawResultErrorMessage",
         RawFormat.prefix.fields + " ".join(objects.Error._fields),
         defaults=objects.Error._defaults)):
     pass
 
 class RawResultNull(RawFormat, NullMessage, namedtuple_with_defaults(
-        "RawResultNULLMessage",
+        "RawResultNullMessage",
         RawFormat.prefix.fields + " ".join(objects.Null._fields),
         defaults=objects.Null._defaults)):
+    pass
+
+class RawResultXOK(RawFormat, XOKMessage, namedtuple_with_defaults(
+        "RawResultXOKMessage",
+        RawFormat.prefix.fields + " ".join(objects.XOK._fields),
+        defaults=objects.XOK._defaults)):
+    pass
+
+class RawResultXFail(RawFormat, XFailMessage, namedtuple_with_defaults(
+        "RawResultXFailMessage",
+        RawFormat.prefix.fields + " ".join(objects.XFail._fields),
+        defaults=objects.XFail._defaults)):
+    pass
+
+class RawResultXError(RawFormat, XErrorMessage, namedtuple_with_defaults(
+        "RawResultXErrorMessage",
+        RawFormat.prefix.fields + " ".join(objects.XError._fields),
+        defaults=objects.XError._defaults)):
+    pass
+
+class RawResultXNull(RawFormat, XNullMessage, namedtuple_with_defaults(
+        "RawResultXNullMessage",
+        RawFormat.prefix.fields + " ".join(objects.XNull._fields),
+        defaults=objects.XNull._defaults)):
     pass
 
 class RawNote(RawFormat, NoteMessage, namedtuple_with_defaults(

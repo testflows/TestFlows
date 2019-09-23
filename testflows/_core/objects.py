@@ -37,12 +37,26 @@ class OK(Result):
     def __bool__(self):
         return True
 
+class XOK(Result):
+    def __init__(self, test, message=None):
+        return super(XOK, self).__init__(test, message=message)
+
+    def __bool__(self):
+        return True
+
 class Fail(Result):
     def __init__(self, test, message=None):
         return super(Fail, self).__init__(test, message=message)
 
     def __bool__(self):
         return False
+
+class XFail(Result):
+    def __init__(self, test, message=None):
+        return super(XFail, self).__init__(test, message=message)
+
+    def __bool__(self):
+        return True
 
 class Skip(Result):
     def __init__(self, test, message=None):
@@ -58,12 +72,26 @@ class Error(Result):
     def __bool__(self):
         return False
 
+class XError(Result):
+    def __init__(self, test, message=None):
+        return super(Error, self).__init__(test, message=message)
+
+    def __bool__(self):
+        return True
+
 class Null(Result):
     def __init__(self, test):
         return super(Null, self).__init__(test, message=None)
 
     def __bool__(self):
         return False
+
+class XNull(Result):
+    def __init__(self, test):
+        return super(XNull, self).__init__(test, message=None)
+
+    def __bool__(self):
+        return True
 
 class Argument(TestObject):
     _fields = ("name", "value", "group", "type", "uid")

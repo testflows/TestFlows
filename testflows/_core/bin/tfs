@@ -14,6 +14,8 @@
 # limitations under the License.
 import sys
 
+import testflows.settings as settings
+
 from testflows._core.exceptions import exception
 from testflows._core.cli.text import danger, warning
 from testflows._core.cli.arg.exit import *
@@ -26,6 +28,13 @@ try:
     args, unknown = parser.parse_known_args()
     if unknown:
         raise ExitWithError(f"unknown argument {unknown}")
+
+    if args.debug:
+        settings.debug = True
+
+    if args.no_colors:
+        settings.no_colors = True
+
     args.func(args)
 
 except (ExitException, KeyboardInterrupt, Exception) as exc:

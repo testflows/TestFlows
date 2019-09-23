@@ -22,6 +22,8 @@ from .handlers.log.handler import Handler as log_handler
 from .handlers.document.handler import Handler as document_handler
 from .handlers.requirement.handler import Handler as requirement_handler
 
+from testflows._core import __version__, __license__
+
 class ArgumentParser(ArgumentParserBase):
     """Customized argument parser.
     """
@@ -34,7 +36,15 @@ class ArgumentParser(ArgumentParserBase):
 
 parser = ArgumentParser(prog="tfs")
 
+parser.add_argument("--debug", dest="debug", action="store_true",
+                    help="enable debugging mode", default=False)
+parser.add_argument("--no-colors", dest="no_colors", action="store_true",
+                    help="disable terminal color highlighting", default=False)
+parser.add_argument("-v", "--version", action="version", version=f"{__version__}")
+parser.add_argument("--license", action="version", version=f"{__license__}")
+
 commands = parser.add_subparsers(title='commands', metavar='command', description=None, help=None)
+
 log_handler.add_command(commands)
 requirement_handler.add_command(commands)
 document_handler.add_command(commands)

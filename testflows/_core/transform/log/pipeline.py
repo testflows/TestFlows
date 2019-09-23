@@ -76,7 +76,7 @@ class NiceLogPipeline(Pipeline):
         steps = [
             read_transform(input, tail=tail),
             parse_transform(stop_event),
-            nice_transform(),
+            nice_transform(stop_event),
             write_transform(output),
             stop_transform(stop_event)
         ]
