@@ -71,15 +71,15 @@ def color_keyword(keyword):
 def color_other(other):
     return color(other, "white", attrs=["dim"])
 
-def color_result(result):
+def color_result(prefix, result):
     if result.startswith("X"):
-        return color(result, "blue", attrs=["bold"])
+        return color(prefix + result, "blue", attrs=["bold"])
     elif result.endswith("OK"):
-        return color(result, "green", attrs=["bold"])
+        return color(prefix + result, "green", attrs=["bold"])
     elif result.endswith("Skip"):
-        return color(result, "cyan", attrs=["bold"])
+        return color(prefix + result, "cyan", attrs=["bold"])
     # Error, Fail, Null
-    return color(result, "red", attrs=["bold"])
+    return color(prefix + result, "red", attrs=["bold"])
 
 def format_test(msg, keyword, counts):
     flags = Flags(msg.flags)
@@ -103,8 +103,8 @@ def format_test(msg, keyword, counts):
     out = color_other(f"{started:>20}") + f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name}{color_other(', flags:' + str(flags) if flags else '')}\n"
     return out
 
-def format_result(msg, result, counts):
-    _result = color_result(result)
+def format_result(msg, prefix, result, counts):
+    _result = color_result(prefix, result)
     _test = color_other(split(msg.test)[-1])
 
     _result_name_map = {
@@ -158,15 +158,15 @@ formatters = {
     message.RawDebug: (format_other, f"{mark}    [debug]"),
     message.RawTrace: (format_other, f"{mark}    [trace]"),
     message.RawNone: (format_other, "    "),
-    message.RawResultOK: (format_result, f"{result_mark} OK"),
-    message.RawResultFail: (format_result, f"{result_mark} Fail"),
-    message.RawResultError: (format_result, f"{result_mark} Error"),
-    message.RawResultSkip: (format_result, f"{result_mark} Skip"),
-    message.RawResultNull: (format_result, f"{result_mark} Null"),
-    message.RawResultXOK: (format_result, f"{result_mark} XOK"),
-    message.RawResultXFail: (format_result, f"{result_mark} XFail"),
-    message.RawResultXError: (format_result, f"{result_mark} XError"),
-    message.RawResultXNull: (format_result, f"{result_mark} XNull")
+    message.RawResultOK: (format_result, f"{result_mark} ", "OK"),
+    message.RawResultFail: (format_result, f"{result_mark} ", "Fail"),
+    message.RawResultError: (format_result, f"{result_mark} ", "Error"),
+    message.RawResultSkip: (format_result, f"{result_mark} ", "Skip"),
+    message.RawResultNull: (format_result, f"{result_mark} ", "Null"),
+    message.RawResultXOK: (format_result, f"{result_mark} ", "XOK"),
+    message.RawResultXFail: (format_result, f"{result_mark} ", "XFail"),
+    message.RawResultXError: (format_result, f"{result_mark} ", "XError"),
+    message.RawResultXNull: (format_result, f"{result_mark} ", "XNull")
 }
 
 def transform(stop):

@@ -31,8 +31,14 @@ class Message(IntEnum):
     NOTE = 13
     DEBUG = 14
     TRACE = 15
+    XOK = 16
+    XFAIL = 17
+    XERROR = 18
+    XNULL = 19
 
 MessageMap = namedtuple(
         "MessageMap",
         "NONE TEST NULL OK FAIL SKIP ERROR ATTRIBUTE ARGUMENT "
-        "DESCRIPTION REQUIREMENT EXCEPTION VALUE NOTE DEBUG TRACE")
+        "DESCRIPTION REQUIREMENT EXCEPTION VALUE NOTE DEBUG TRACE "
+        "XOK XFAIL XERROR XNULL"
+    )

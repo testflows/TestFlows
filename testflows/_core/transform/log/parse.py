@@ -42,7 +42,11 @@ def transform(stop=None):
         message.RawValue, # VALUE
         message.RawNote, # NOTE
         message.RawDebug, # DEBUG
-        message.RawTrace # TRACE
+        message.RawTrace, # TRACE
+        message.RawResultXOK, #XOK
+        message.RawResultXFail, # XFAIL
+        message.RawResultXError, # XERROR
+        message.RawResultXNull # XNULL
     )
     msg = None
     stop_id = f"{id_sep}{settings.test_id}"
