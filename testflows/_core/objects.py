@@ -16,13 +16,20 @@ from .baseobject import TestObject, TestArg
 from .baseobject import get, hash
 
 class Result(TestObject):
-    _fields = ("test", "message")
-    _defaults = (None,)
+    _fields = ("test", "message", "reason")
+    _defaults = (None, None)
 
-    def __init__(self, test, message=None):
+    def __init__(self, test, message=None, reason=None):
         self.test = test
         self.message = message
+        self.reason = reason
         return super(Result, self).__init__()
+
+    def xout(self, reason=None):
+        return self
+
+    def __bool__(cls):
+        return True
 
     def __eq__(self, o):
         return type(self) == o
@@ -30,68 +37,48 @@ class Result(TestObject):
     def __ne__(self, o):
         return not self == o
 
+class XResult(Result):
+    pass
+
 class OK(Result):
-    def __init__(self, test, message=None):
-        return super(OK, self).__init__(test, message=message)
-    
-    def __bool__(self):
-        return True
+    def xout(self, reason):
+        return XOK(self.test, self.message, reason)
 
-class XOK(Result):
-    def __init__(self, test, message=None):
-        return super(XOK, self).__init__(test, message=message)
-
-    def __bool__(self):
-        return True
+class XOK(XResult):
+    pass
 
 class Fail(Result):
-    def __init__(self, test, message=None):
-        return super(Fail, self).__init__(test, message=message)
+    def xout(self, reason):
+        return XFail(self.test, self.message, reason)
 
     def __bool__(self):
         return False
 
-class XFail(Result):
-    def __init__(self, test, message=None):
-        return super(XFail, self).__init__(test, message=message)
-
-    def __bool__(self):
-        return True
+class XFail(XResult):
+    pass
 
 class Skip(Result):
-    def __init__(self, test, message=None):
-        return super(Skip, self).__init__(test, message=message)
-
-    def __bool__(self):
-        return True
+    pass
 
 class Error(Result):
-    def __init__(self, test, message=None):
-        return super(Error, self).__init__(test, message=message)
+    def xout(self, reason):
+        return XError(self.test, self.message, reason)
 
     def __bool__(self):
         return False
 
-class XError(Result):
-    def __init__(self, test, message=None):
-        return super(Error, self).__init__(test, message=message)
-
-    def __bool__(self):
-        return True
+class XError(XResult):
+    pass
 
 class Null(Result):
-    def __init__(self, test):
-        return super(Null, self).__init__(test, message=None)
+    def xout(self, reason):
+        return XNull(self.test, self.message, reason)
 
     def __bool__(self):
         return False
 
-class XNull(Result):
-    def __init__(self, test):
-        return super(XNull, self).__init__(test, message=None)
-
-    def __bool__(self):
-        return True
+class XNull(XResult):
+    pass
 
 class Argument(TestObject):
     _fields = ("name", "value", "group", "type", "uid")

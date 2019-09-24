@@ -29,13 +29,33 @@ from .testtype import TestType
 from .objects import get, Null, OK, Fail, Skip, Error, Argument
 from .constants import name_sep, id_sep
 from .io import TestIO, LogWriter
-from .name import join, depth, match
+from .name import join, depth, match, absname
 from .funcs import current_test, main, skip, ok, fail, error, exception
 from .init import init
 from .cli.arg.parser import ArgumentParser
 from .cli.arg.exit import ExitWithError, ExitException
 from .cli.text import danger, warning
 from .exceptions import exception as get_exception
+
+class xfails(dict):
+    """xfails container.
+
+    xfails = {
+        "filter": [("result", "reason")],
+        ...
+        }
+    """
+    pass
+
+class xflags(dict):
+    """xflags container.
+
+    xflags = {
+        "filter": (set_flags, clear_flags),
+        ... 
+    }
+    """
+    pass
 
 class DummyTest(object):
     """Base class for dummy tests.
@@ -157,7 +177,7 @@ class Test(object):
     def __init__(self, name=None, flags=None, cflags=None, type=None,
                  uid=None, tags=None, attributes=None, requirements=None,
                  users=None, tickets=None, description=None, parent=None,
-                 only=None, start=None, end=None, args=None, id=None):
+                 xfails=None, xflags=None, only=None, skip=None, start=None, end=None, args=None, id=None):
         global current_test
 
         cli_args = {}
@@ -173,12 +193,10 @@ class Test(object):
         self.start_time = time.time()
         self.parent = parent
         self.id = get(id, [settings.test_id])
-        self.name = name % {"name": self.name} if name is not None else self.name
-
+        self.name = name
         if self.name is None:
             raise TypeError("name must be specified")
 
-        self.name = self.name.replace(name_sep, "\\" + name_sep)
         self.tags = get(tags, self.tags)
         self.requirements = get(requirements, self.requirements)
         self.attributes = get(attributes, self.attributes)
@@ -188,7 +206,6 @@ class Test(object):
         self.args = get(args, {})
         self.args.update(cli_args)
         self._process_args()
-        self.name = join(get(self.parent, name_sep), self.name)
         self.result = Null(self.name)
         if flags is not None:
             self.flags = Flags(flags)
@@ -196,12 +213,27 @@ class Test(object):
         self.cflags = Flags(cflags) | (self.flags & CFLAGS)
         self.uid = get(uid, self.uid)
 
+        self.xfails = get(xfails, globals()["xfails"]())
+        self.xflags = get(xflags, globals()["xflags"]())
+
         self.only = [o.at(self.name) for o in get(only, [])]
+        self.skip = [o.at(self.name) for o in get(skip, [])]
         self.start = [s.at(self.name) for s in get(start, [])]
         self.end = [e.at(self.name) for e in get(end, [])]
         self.caller_test = None
 
         self.init(**self.args)
+
+    @classmethod
+    def make_name(cls, name, parent=None):
+        """Make full name.
+
+        :param name: name
+        :param parent: parent name
+        """
+        name = name % {"name": cls.name} if name is not None else cls.name
+        name = name.replace(name_sep, "\\" + name_sep)
+        return join(get(parent, name_sep), name)
 
     def _process_args(self):
         """Process arguments by converting
@@ -264,10 +296,21 @@ class Test(object):
                 if isinstance(self.result, Null):
                     self.result = OK(self.name)
         finally:
+            self._apply_xfails()
             self.io.output.result(self.result)
             self.io.close()
 
         return True
+
+    def _apply_xfails(self):
+        """Apply xfails to self.result.
+        """
+        for pattern, xouts in self.xfails.items():
+            if match(self.name, pattern):
+                for xout in xouts:
+                    result, reason = xout
+                    if isinstance(self.result, result):
+                        self.result = self.result.xout(reason)
 
     def init(self, **args):
         pass
@@ -311,12 +354,24 @@ class _test(object):
         test = test if test is not None else Test
 
         if parent:
+            name = test.make_name(name, parent.name)
             kwargs["parent"] = parent.name
             kwargs["id"] = parent.id + [parent.child_count]
             kwargs["cflags"] = parent.cflags
+            # only propagate xfails that prefix match the name of the test
+            kwargs["xfails"] = {
+                    k: v for k, v in parent.xfails.items() if match(name, k, prefix=True)
+                } or kwargs.get("xfails")
             # handle parent test type propagation
             self._parent_type_propagation(parent, kwargs)
             parent.child_count += 1
+        else:
+            name = test.make_name(name)
+
+        # anchor all xfails patterns
+        kwargs["xfails"] = {
+                absname(k, parent.name if parent else name_sep): v for k, v in (kwargs.get("xfails") or {}).items()
+            } or None
 
         self.parent = parent
         self.test = test(name, **kwargs)

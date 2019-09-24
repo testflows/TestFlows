@@ -114,7 +114,7 @@ class TestOutput(object):
 
         :param result: result object
         """
-        msg = dumps([self.test.name, result.message])[1:-1]
+        msg = dumps([self.test.name, result.message, result.reason])[1:-1]
         self.message(getattr(Message, result.__class__.__name__.upper()), msg)
 
     def note(self, message):

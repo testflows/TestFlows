@@ -130,7 +130,10 @@ def format_result(msg, prefix, result, counts):
     else:
         setattr(counts["test"], _name, getattr(counts["test"], _name) + 1)
 
-    return color_other(f"{strftimedelta(msg.p_time):>20}") + f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_result} {_test}{color_other((', ' + msg.message) if msg.message else '')}\n"
+    return (color_other(f"{strftimedelta(msg.p_time):>20}") +
+        f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_result} "
+        f"{_test}{color_other((', ' + msg.message) if msg.message else '')}"
+        f"{color_other((', ' + msg.reason) if msg.reason else '')}\n")
 
 def format_other(msg, keyword, counts):
     fields = ' '.join([str(f) for f in msg[message.Prefix.time + 1:]])
