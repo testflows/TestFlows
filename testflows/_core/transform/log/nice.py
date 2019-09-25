@@ -19,7 +19,7 @@ from testflows._core.testtype import TestType
 from testflows._core.transform.log import message
 from testflows._core.utils.timefuncs import strftime, strftimedelta
 from testflows._core.utils.timefuncs import localfromtimestamp
-from testflows._core.name import split
+from testflows._core.name import split, basename
 from testflows._core.cli.colors import color
 from testflows._core import __version__
 
@@ -105,7 +105,7 @@ def format_test(msg, keyword, counts):
 
 def format_result(msg, prefix, result, counts):
     _result = color_result(prefix, result)
-    _test = color_other(split(msg.test)[-1])
+    _test = color_other(basename(msg.test))
 
     _result_name_map = {
         message.RawResultOK: "ok",
@@ -132,7 +132,7 @@ def format_result(msg, prefix, result, counts):
 
     return (color_other(f"{strftimedelta(msg.p_time):>20}") +
         f"{'':3}{indent * (msg.p_id.count('/') - 1)}{_result} "
-        f"{_test}{color_other((', ' + msg.message) if msg.message else '')}"
+        f"{_test}{color_other(', ' + msg.test)}{color_other((', ' + msg.message) if msg.message else '')}"
         f"{color_other((', ' + msg.reason) if msg.reason else '')}\n")
 
 def format_other(msg, keyword, counts):
