@@ -11,6 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import testflows.settings as settings
+
+from testflows._core.flags import Flags, SKIP
 from testflows._core.testtype import TestType
 from testflows._core.transform.log import message
 from testflows._core.name import split
@@ -25,7 +28,9 @@ def color_test_name(name):
     return color(split(name)[-1], "white", attrs=["dim"])
 
 def color_result(result):
-    if result == "OK":
+    if result.startswith("X"):
+        return color(result, "blue", attrs=["bold"])
+    elif result == "OK":
         return color(result, "green", attrs=["bold"])
     elif result == "Skip":
         return color(result, "cyan", attrs=["bold"])
@@ -33,6 +38,10 @@ def color_result(result):
     return color(result, "red", attrs=["bold"])
 
 def format_test(msg, keyword):
+    flags = Flags(msg.p_flags)
+    if flags & SKIP and settings.show_skipped is False:
+        return
+
     if msg.p_type == TestType.Module:
         keyword += "Module"
     elif msg.p_type == TestType.Suite:
@@ -47,6 +56,10 @@ def format_test(msg, keyword):
     return f"{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name}\n"
 
 def format_result(msg, result):
+    flags = Flags(msg.p_flags)
+    if flags & SKIP and settings.show_skipped is False:
+        return
+
     _result = color_result(result)
     return f"{indent * (msg.p_id.count('/') - 1)}{_result}\n"
 
@@ -56,7 +69,11 @@ formatters = {
     message.RawResultFail: (format_result, f"Fail"),
     message.RawResultError: (format_result, f"Error"),
     message.RawResultSkip: (format_result, f"Skip"),
-    message.RawResultNull: (format_result, f"Null")
+    message.RawResultNull: (format_result, f"Null"),
+    message.RawResultXOK: (format_result, f"XOK"),
+    message.RawResultXFail: (format_result, f"XFail"),
+    message.RawResultXError: (format_result, f"XError"),
+    message.RawResultXNull: (format_result, f"XNull")
 }
 
 def transform():
