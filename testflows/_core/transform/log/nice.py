@@ -14,7 +14,9 @@
 import re
 import textwrap
 
-from testflows._core.flags import Flags
+import testflows.settings as settings
+
+from testflows._core.flags import Flags, SKIP
 from testflows._core.testtype import TestType
 from testflows._core.transform.log import message
 from testflows._core.utils.timefuncs import strftime, strftimedelta
@@ -82,8 +84,9 @@ def color_result(prefix, result):
     return color(prefix + result, "red", attrs=["bold"])
 
 def format_test(msg, keyword, counts):
-    flags = Flags(msg.flags)
-
+    flags = Flags(msg.p_flags)
+    if flags & SKIP and settings.show_skipped is False:
+        return
     if msg.p_type == TestType.Module:
         keyword += "Module"
         counts["module"].units += 1
@@ -104,6 +107,8 @@ def format_test(msg, keyword, counts):
     return out
 
 def format_result(msg, prefix, result, counts):
+    if Flags(msg.p_flags) & SKIP and settings.show_skipped is False:
+        return
     _result = color_result(prefix, result)
     _test = color_other(basename(msg.test))
 
@@ -136,6 +141,8 @@ def format_result(msg, prefix, result, counts):
         f"{color_other((', ' + msg.reason) if msg.reason else '')}\n")
 
 def format_other(msg, keyword, counts):
+    if Flags(msg.p_flags) & SKIP and settings.show_skipped is False:
+        return
     fields = ' '.join([str(f) for f in msg[message.Prefix.time + 1:]])
     if msg.p_stream:
         fields = f"[{msg.p_stream}] {fields}"
@@ -197,10 +204,11 @@ def transform(stop):
                 line = None
 
             if n < 1:
-                line = color_other(f"TestFlows Test Framework v{__version__}\n{divider}\n") + line
+                line = color_other(f"TestFlows Test Framework v{__version__}\n{divider}\n") + (line or "")
 
             if stop.is_set():
-                0
+                if line is None:
+                    line = ""
                 line_icon = "\u27a4 "
                 line += color_other(f"{divider}\n")
                 if counts["module"]:

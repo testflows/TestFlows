@@ -12,91 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # to the end flag
-import copy
-
-from .name import absname
+from .name import absname, match
 from .baseobject import TestObject
 
-class Operator(object):
-    Invert, And, Or = (0,1,2)
-
-
-class Filter(TestObject):
-    """Base class for all filter objects.
+class the(TestObject):
+    """The `only`, `skip`, `start` and `end` test filer object.
     """
-    def __init__(self):
-        self.expr = None
+    _fields = ("pattern", "tags")
+    _defaults = (None,)
 
-    def match(self, test):
-        return False
-
-    def __and__(self, o):
-        self.expr = [Operator.And, copy.deepcopy(self), copy.deepcopy(o)]
-        return self
-    
-    def __or__(self, o):
-        self.expr = [Operator.Or, copy.deepcopy(self), copy.deepcopy(o)]
-        return self
-    
-    def __invert__(self):
-        self.expr = [Operator.Invert, copy.deepcopy(self)]
-        return self
-    
-    def __repr__(self):
-        s = ""
-        args = ",".join([repr(arg) for arg in self.initargs.args])
-        kwargs = ",".join([name + "=" + repr(value) for name, value in self.initargs.kwargs.items()])
-        if args and kwargs:
-            args += ","
-        name = self.__class__.__name__ 
-        if not self.expr:
-            s += "%s(%s%s)" % (name, args, kwargs)
-        else:
-            op, args = self.expr[0], self.expr[1:]
-            if op == Operator.Invert:
-                s += "~(%s)" % repr(args[0])
-            elif op == Operator.Or:
-                s += "(%s | %s)" % (repr(args[0]), repr(args[1]))
-            elif op == Operator.And:
-                s += "(%s & %s)" % (repr(args[0]), repr(args[1]))
-            else:
-                raise ValueError("unknown operator %s" % repr(op))
-        return s
-            
-
-class tag(Filter):
-    """Tag test filter object.
-    """
-    _fields = ("name")
-    
-    def __init__(self, name):
-        self.name = name
-        super(tag, self).__init__()
-    
-    def match(self, test):
-        return False
-  
-
-class the(Filter):
-    """The `only`, `start` and `end` test filer object.
-    """
-    _fields = ("suite", "test", "tags")
-    
-    def __init__(self, suite, test, tags=[]):
-        self.suite = suite
-        self.test = test
-        self.tags = tags
+    def __init__(self, pattern, tags=None):
+        self.pattern = pattern
+        self.tags = set(tags if tags is not None else [])
         super(the, self).__init__()
 
     def at(self, at):
-        """Anchor filter by converting all suite patterns to be absolute.
+        """Anchor filter by converting all patterns to be absolute.
         """
-        new = the(absname(self.suite, at), self.test, self.tags)
-        if self.expr:
-            new.expr = [self.expr[0]]
-            for i,a in enumerate(self.expr[1:]):
-                new.expr.append(self.expr[i].at(at))
-        return new
+        self.pattern = absname(self.pattern, at)
+        return self
 
-    def match(self, test):
-        return False
+    def match(self, name, tags=None, prefix=True):
+        if tags is None:
+            tags = set()
+
+        if match(name, self.pattern, prefix=prefix):
+            if self.tags:
+                if tags.issubset(self.tags):
+                    return True
+                return False
+            return True

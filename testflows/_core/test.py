@@ -36,16 +36,25 @@ from .cli.arg.parser import ArgumentParser
 from .cli.arg.exit import ExitWithError, ExitException
 from .cli.text import danger, warning
 from .exceptions import exception as get_exception
+from .filters import the
 
 class xfails(dict):
     """xfails container.
 
     xfails = {
-        "filter": [("result", "reason")],
+        "pattern": [("result", "reason")],
         ...
         }
     """
-    pass
+    def add(self, pattern, *results):
+        """Add an entry to the xfails.
+
+        :param pattern: test name pattern to match
+        :param *results: one or more results to cross out
+            where each result is a two-tuple of (result, reason)
+        """
+        self[pattern] = results
+        return self
 
 class xflags(dict):
     """xflags container.
@@ -55,7 +64,15 @@ class xflags(dict):
         ... 
     }
     """
-    pass
+    def add(self, pattern, set_flags=0, clear_flags=0):
+        """Add an entry to the xflags.
+
+        :param pattern: test name pattern to match
+        :param set_flags: flags to set
+        :param clear_flags: flags to clear, default: None
+        """
+        self[pattern] = (Flags(set_flags), Flags(clear_flags))
+        return self
 
 class DummyTest(object):
     """Base class for dummy tests.
@@ -123,7 +140,8 @@ class Test(object):
                 default: 'nice'""")
         parser.add_argument("-l", "--log", dest="_log", metavar="file", type=str,
             help="path to the log file where test output will be stored, default: uses temporary log file")
-
+        parser.add_argument("--show-skipped", dest="_show_skipped", action="store_true",
+            help="show skipped tests, default: False", default=False)
         return parser
 
     def parse_cli_args(self):
@@ -164,6 +182,9 @@ class Test(object):
 
             settings.output_format = args.pop("_output")
 
+            if args.get("_show_skipped"):
+                settings.show_skipped = True
+
         except (ExitException, KeyboardInterrupt, Exception) as exc:
             #if settings.debug:
             sys.stderr.write(warning(get_exception(), eol='\n'))
@@ -177,7 +198,8 @@ class Test(object):
     def __init__(self, name=None, flags=None, cflags=None, type=None,
                  uid=None, tags=None, attributes=None, requirements=None,
                  users=None, tickets=None, description=None, parent=None,
-                 xfails=None, xflags=None, only=None, skip=None, start=None, end=None, args=None, id=None):
+                 xfails=None, xflags=None, only=None, skip=None,
+                 start=None, end=None, args=None, id=None):
         global current_test
 
         cli_args = {}
@@ -196,8 +218,7 @@ class Test(object):
         self.name = name
         if self.name is None:
             raise TypeError("name must be specified")
-
-        self.tags = get(tags, self.tags)
+        self.tags = tags
         self.requirements = get(requirements, self.requirements)
         self.attributes = get(attributes, self.attributes)
         self.users = get(users, self.users)
@@ -212,14 +233,12 @@ class Test(object):
         self.type = get(type, TestType.Test)
         self.cflags = Flags(cflags) | (self.flags & CFLAGS)
         self.uid = get(uid, self.uid)
-
-        self.xfails = get(xfails, globals()["xfails"]())
-        self.xflags = get(xflags, globals()["xflags"]())
-
-        self.only = [o.at(self.name) for o in get(only, [])]
-        self.skip = [o.at(self.name) for o in get(skip, [])]
-        self.start = [s.at(self.name) for s in get(start, [])]
-        self.end = [e.at(self.name) for e in get(end, [])]
+        self.xfails = get(xfails, {})
+        self.xflags = get(xflags, {})
+        self.only = get(only, [])
+        self.skip = get(skip, [])
+        self.start = get(start, None)
+        self.end = get(end, None)
         self.caller_test = None
 
         self.init(**self.args)
@@ -234,6 +253,10 @@ class Test(object):
         name = name % {"name": cls.name} if name is not None else cls.name
         name = name.replace(name_sep, "\\" + name_sep)
         return join(get(parent, name_sep), name)
+
+    @classmethod
+    def make_tags(cls, tags):
+        return get(tags, cls.tags)
 
     def _process_args(self):
         """Process arguments by converting
@@ -358,23 +381,100 @@ class _test(object):
             kwargs["parent"] = parent.name
             kwargs["id"] = parent.id + [parent.child_count]
             kwargs["cflags"] = parent.cflags
-            # only propagate xfails that prefix match the name of the test
+            # propagate xfails, xflags, only and skip that prefix match the name of the test
             kwargs["xfails"] = {
                     k: v for k, v in parent.xfails.items() if match(name, k, prefix=True)
                 } or kwargs.get("xfails")
+            kwargs["xflags"] = {
+                    k: v for k, v in parent.xflags.items() if match(name, k, prefix=True)
+                } or kwargs.get("xflags")
+            kwargs["only"] = parent.only or kwargs.get("only")
+            kwargs["skip"] = parent.skip or kwargs.get("skip")
+            kwargs["start"] = parent.start or kwargs.get("start")
+            kwargs["end"] = parent.end or kwargs.get("end")
             # handle parent test type propagation
             self._parent_type_propagation(parent, kwargs)
             parent.child_count += 1
         else:
             name = test.make_name(name)
+        tags = test.make_tags(kwargs.get("tags"))
 
-        # anchor all xfails patterns
+        # anchor all patterns
         kwargs["xfails"] = {
-                absname(k, parent.name if parent else name_sep): v for k, v in (kwargs.get("xfails") or {}).items()
+                absname(k, name if name else name_sep): v for k, v in (kwargs.get("xfails") or {}).items()
             } or None
+        kwargs["xflags"] = {
+                absname(k, name if name else name_sep): v for k, v in (kwargs.get("xflags") or {}).items()
+            } or None
+        kwargs["only"] = [f.at(name if name else name_sep) for f in kwargs.get("only") or []] or None
+        kwargs["skip"] = [f.at(name if name else name_sep) for f in kwargs.get("skip") or []] or None
+        kwargs["start"] = kwargs.get("start").at(name if name else name_sep) if kwargs.get("start") else None
+        kwargs["end"] = kwargs.get("end").at(name if name else name_sep) if kwargs.get("end") else None
 
         self.parent = parent
-        self.test = test(name, **kwargs)
+        self._apply_xflags(name, kwargs)
+        self._apply_only(name, tags, kwargs)
+        self._apply_skip(name, tags, kwargs)
+        self._apply_start(name, tags, parent, kwargs)
+        self._apply_end(name, tags, parent, kwargs)
+        self.test = test(name, tags=tags, **kwargs)
+
+    def _apply_end(self, name, tags, parent, kwargs):
+        end = kwargs.get("end")
+        if not end:
+            return
+
+        if end.match(name, tags):
+            if parent:
+                parent.end = None
+                parent.skip = [the("/*")]
+
+    def _apply_start(self, name, tags, parent, kwargs):
+        start = kwargs.get("start")
+        if not start:
+            return
+
+        if not start.match(name, tags):
+            kwargs["flags"] = Flags(kwargs.get("flags")) | SKIP
+        else:
+            kwargs["flags"] = Flags(kwargs.get("flags")) & ~SKIP
+            if parent:
+                parent.start = None
+
+    def _apply_only(self, name, tags, kwargs):
+        only = kwargs.get("only")
+        if not only:
+            return
+
+        found = False
+        for item in only:
+            if item.match(name, tags):
+                found = True
+                break
+
+        if not found:
+            kwargs["flags"] = Flags(kwargs.get("flags")) | SKIP
+        else:
+            kwargs["flags"] = Flags(kwargs.get("flags")) & ~SKIP
+
+    def _apply_skip(self, name, tags, kwargs):
+        skip = kwargs.get("skip")
+        if not skip:
+            return
+
+        for item in skip:
+            if item.match(name, tags, prefix=False):
+                kwargs["flags"] = Flags(kwargs.get("flags")) | SKIP
+                break
+
+    def _apply_xflags(self, name, kwargs):
+        xflags = kwargs.get("xflags")
+        if not xflags:
+            return
+        for pattern, item in xflags.items():
+            if match(name, pattern):
+                set_flags, clear_flags = item
+                kwargs["flags"] = (Flags(kwargs.get("flags")) & ~Flags(clear_flags)) | Flags(set_flags)
 
     def _parent_type_propagation(self, parent, kwargs):
         """Propagate parent test type if lower.

@@ -13,6 +13,7 @@
 # limitations under the License.
 from testflows._core.test import Test, module, suite, test, step, run, load
 from testflows._core.funcs import *
+from testflows._core.filters import the
 from testflows._core.objects import *
 from testflows._core.name import *
 from testflows._core.flags import *

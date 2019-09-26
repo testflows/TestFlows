@@ -31,3 +31,5 @@ output_format = None
 #: log file
 write_logfile = None
 read_logfile = None
+#: show skipped tests
+show_skipped = False
