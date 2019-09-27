@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import sys
 import inspect
+import time
 import threading
 
 from .exceptions import ResultException
@@ -19,6 +21,9 @@ from .serialize import dumps
 from .message import Message
 from .objects import OK, Fail, Error, Skip, Null
 from .objects import XOK, XFail, XError, XNull
+from .cli.text import warning
+from .cli.colors import reset as reset_colors
+from .cli.colors import cursor_up as move_cursor_up
 
 #: current test handle
 current_test = threading.local()
@@ -118,3 +123,9 @@ def xnull(test=None):
         test = current_test.object
     test.result = XNull(test.name)
     raise ResultException(test.result)
+
+def pause(test=None):
+    if test is None:
+        test = current_test.object
+    message(reset_colors() + warning("\u270b Paused, enter any key to continue...", eol="") + move_cursor_up())
+    input()

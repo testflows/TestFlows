@@ -24,13 +24,13 @@ import testflows.settings as settings
 
 from .exceptions import DummyTestException, ArgumentError, ResultException
 from .flags import Flags, SKIP, TE, FAIL_NOT_COUNTED, ERROR_NOT_COUNTED, NULL_NOT_COUNTED
-from .flags import CFLAGS
+from .flags import CFLAGS, PAUSE_BEFORE, PAUSE_AFTER
 from .testtype import TestType
 from .objects import get, Null, OK, Fail, Skip, Error, Argument
 from .constants import name_sep, id_sep
 from .io import TestIO, LogWriter
 from .name import join, depth, match, absname
-from .funcs import current_test, main, skip, ok, fail, error, exception
+from .funcs import current_test, main, skip, ok, fail, error, exception, pause
 from .init import init
 from .cli.arg.parser import ArgumentParser
 from .cli.arg.exit import ExitWithError, ExitException
@@ -71,7 +71,7 @@ class xflags(dict):
         :param set_flags: flags to set
         :param clear_flags: flags to clear, default: None
         """
-        self[pattern] = (Flags(set_flags), Flags(clear_flags))
+        self[pattern] = [Flags(set_flags), Flags(clear_flags)]
         return self
 
 class DummyTest(object):
@@ -151,6 +151,10 @@ class Test(object):
             help="start at the selected test", type=str, required=False)
         parser.add_argument("--end", dest="_end", metavar="pattern", nargs=1,
             help="end at the selected test", type=str, required=False)
+        parser.add_argument("--pause-before", dest="_pause_before", metavar="pattern", nargs="+",
+            help="pause before executing selected tests", type=str, required=False)
+        parser.add_argument("--pause-after", dest="_pause_after", metavar="pattern", nargs="+",
+            help="pause after executing selected tests", type=str, required=False)
         parser.add_argument("--debug", dest="_debug", action="store_true",
             help="enable debugging mode", default=False)
         parser.add_argument("--no-colors", dest="_no_colors", action="store_true",
@@ -166,7 +170,7 @@ class Test(object):
             help="show skipped tests, default: False", default=False)
         return parser
 
-    def parse_cli_args(self, only=None, skip=None, start=None, end=None):
+    def parse_cli_args(self, xflags=None, only=None, skip=None, start=None, end=None):
         """Parse command line arguments.
 
         :return: parsed known arguments
@@ -208,6 +212,24 @@ class Test(object):
                 settings.show_skipped = True
                 args.pop("_show_skipped")
 
+            if args.get("_pause_before"):
+                if not xflags:
+                    xflags = globals()["xflags"]()
+                for pattern in args.get("_pause_before"):
+                    pattern = absname(pattern, self.name)
+                    xflags[pattern] = xflags.get(pattern, [0, 0])
+                    xflags[pattern][0] |= PAUSE_BEFORE
+                args.pop("_pause_before")
+
+            if args.get("_pause_after"):
+                if not xflags:
+                    xflags = globals()["xflags"](xflags)
+                for pattern in args.get("_pause_after"):
+                    pattern = absname(pattern, self.name)
+                    xflags[pattern] = xflags.get(pattern, [0, 0])
+                    xflags[pattern][0] |= PAUSE_AFTER
+                args.pop("_pause_after")
+
             if args.get("_only"):
                 only = [] # clear whatever was passed
                 for pattern in args.get("_only"):
@@ -237,7 +259,7 @@ class Test(object):
             else:
                 sys.exit(1)
 
-        return args, only, skip, start, end
+        return args, xflags, only, skip, start, end
 
     def __init__(self, name=None, flags=None, cflags=None, type=None,
                  uid=None, tags=None, attributes=None, requirements=None,
@@ -257,7 +279,7 @@ class Test(object):
             current_test.main = self
             frame = inspect.currentframe().f_back.f_back.f_back
             if main(frame):
-                cli_args, only, skip, start, end = self.parse_cli_args(only, skip, start, end)
+                cli_args, xflags, only, skip, start, end = self.parse_cli_args(xflags, only, skip, start, end)
 
         self.child_count = 0
         self.start_time = time.time()
@@ -334,6 +356,9 @@ class Test(object):
         self.io = TestIO(self)
         self.io.output.test_message()
 
+        if self.flags & PAUSE_BEFORE:
+            pause()
+
         self.caller_test = current_test.object
         current_test.object = self
 
@@ -367,6 +392,9 @@ class Test(object):
             self._apply_xfails()
             self.io.output.result(self.result)
             self.io.close()
+
+            if self.flags & PAUSE_AFTER:
+                pause()
 
         return True
 
@@ -427,12 +455,12 @@ class _test(object):
             kwargs["id"] = parent.id + [parent.child_count]
             kwargs["cflags"] = parent.cflags
             # propagate xfails, xflags, only and skip that prefix match the name of the test
-            kwargs["xfails"] = {
+            kwargs["xfails"] = xfails({
                     k: v for k, v in parent.xfails.items() if match(name, k, prefix=True)
-                } or kwargs.get("xfails")
-            kwargs["xflags"] = {
+                }) or kwargs.get("xfails")
+            kwargs["xflags"] = xflags({
                     k: v for k, v in parent.xflags.items() if match(name, k, prefix=True)
-                } or kwargs.get("xflags")
+                }) or kwargs.get("xflags")
             kwargs["only"] = parent.only or kwargs.get("only")
             kwargs["skip"] = parent.skip or kwargs.get("skip")
             kwargs["start"] = parent.start or kwargs.get("start")
@@ -445,12 +473,12 @@ class _test(object):
         tags = test.make_tags(kwargs.get("tags"))
 
         # anchor all patterns
-        kwargs["xfails"] = {
+        kwargs["xfails"] = xfails({
                 absname(k, name if name else name_sep): v for k, v in (kwargs.get("xfails") or {}).items()
-            } or None
-        kwargs["xflags"] = {
+            }) or None
+        kwargs["xflags"] = xflags({
                 absname(k, name if name else name_sep): v for k, v in (kwargs.get("xflags") or {}).items()
-            } or None
+            }) or None
         kwargs["only"] = [f.at(name if name else name_sep) for f in kwargs.get("only") or []] or None
         kwargs["skip"] = [f.at(name if name else name_sep) for f in kwargs.get("skip") or []] or None
         kwargs["start"] = kwargs.get("start").at(name if name else name_sep) if kwargs.get("start") else None

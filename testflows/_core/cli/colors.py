@@ -76,7 +76,11 @@ COLORS = dict(
             ))
         )
 
-RESET = '\033[0m'
+def reset():
+    return '\033[0m' if not settings.no_colors else ''
+
+def cursor_up():
+    return '\033[A' if not settings.no_colors else ''
 
 def red(text, on_color=None, attrs=None):
     return color(text, "red", on_color=on_color, attrs=attrs)
@@ -124,6 +128,6 @@ def color(text, color=None, on_color=None, attrs=None):
             for attr in attrs:
                 text = fmt_str % (ATTRIBUTES[attr], text)
 
-        text += RESET
+        text += reset()
     return text
 
