@@ -124,11 +124,33 @@ class Test(object):
 
         :return: argument parser
         """
+        definitions_description = """
+        
+        Option values
+        
+        pattern 
+          used to match test names using a unix-like file path pattern that supports wildcards
+            '/' path level separator
+            '*' matches everything
+            '?' matches any single character
+            '[seq]' matches any character in seq
+            '[!seq]' matches any character not in seq
+            ':' matches anything at the current path level
+          for example: "suiteA/*" selects all the tests in 'suiteA'
+        """
         parser = ArgumentParser(
                 prog=sys.argv[0],
-                description=(cls.description or ""),
+                description=((cls.description or "") + definitions_description),
                 description_prog="Test - Framework"
             )
+        parser.add_argument("--only", dest="_only", metavar="pattern", nargs="+",
+            help="run only selected tests", type=str, required=False)
+        parser.add_argument("--skip", dest="_skip", metavar="pattern", nargs="+",
+            help="skip selected tests", type=str, required=False)
+        parser.add_argument("--start", dest="_start", metavar="pattern", nargs=1,
+            help="start at the selected test", type=str, required=False)
+        parser.add_argument("--end", dest="_end", metavar="pattern", nargs=1,
+            help="end at the selected test", type=str, required=False)
         parser.add_argument("--debug", dest="_debug", action="store_true",
             help="enable debugging mode", default=False)
         parser.add_argument("--no-colors", dest="_no_colors", action="store_true",
@@ -144,7 +166,7 @@ class Test(object):
             help="show skipped tests, default: False", default=False)
         return parser
 
-    def parse_cli_args(self):
+    def parse_cli_args(self, only=None, skip=None, start=None, end=None):
         """Parse command line arguments.
 
         :return: parsed known arguments
@@ -184,6 +206,27 @@ class Test(object):
 
             if args.get("_show_skipped"):
                 settings.show_skipped = True
+                args.pop("_show_skipped")
+
+            if args.get("_only"):
+                only = [] # clear whatever was passed
+                for pattern in args.get("_only"):
+                    only.append(the(pattern).at(self.name))
+                args.pop("_only")
+
+            if args.get("_skip"):
+                skip = [] # clear whatever was passed
+                for pattern in args.get("_skip"):
+                    only.append(the(pattern).at(self.name))
+                args.pop("_skip")
+
+            if args.get("_start"):
+                start = the(args.get("_start")[0]).at(self.name)
+                args.pop("_start")
+
+            if args.get("_end"):
+                end = the(args.get("_end")[0]).at(self.name)
+                args.pop("_end")
 
         except (ExitException, KeyboardInterrupt, Exception) as exc:
             #if settings.debug:
@@ -193,7 +236,8 @@ class Test(object):
                 sys.exit(exc.exitcode)
             else:
                 sys.exit(1)
-        return args
+
+        return args, only, skip, start, end
 
     def __init__(self, name=None, flags=None, cflags=None, type=None,
                  uid=None, tags=None, attributes=None, requirements=None,
@@ -202,6 +246,10 @@ class Test(object):
                  start=None, end=None, args=None, id=None):
         global current_test
 
+        self.name = name
+        if self.name is None:
+            raise TypeError("name must be specified")
+
         cli_args = {}
         if current_test.object is None:
             if current_test.main is not None:
@@ -209,15 +257,12 @@ class Test(object):
             current_test.main = self
             frame = inspect.currentframe().f_back.f_back.f_back
             if main(frame):
-                cli_args = self.parse_cli_args()
+                cli_args, only, skip, start, end = self.parse_cli_args(only, skip, start, end)
 
         self.child_count = 0
         self.start_time = time.time()
         self.parent = parent
         self.id = get(id, [settings.test_id])
-        self.name = name
-        if self.name is None:
-            raise TypeError("name must be specified")
         self.tags = tags
         self.requirements = get(requirements, self.requirements)
         self.attributes = get(attributes, self.attributes)
