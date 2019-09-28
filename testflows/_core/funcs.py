@@ -59,7 +59,7 @@ def append_path(pathlist, path, *rest, **kwargs):
     """
     pos = kwargs.pop("pos", None)
     frame = inspect.currentframe().f_back
-    dir = os.path.dirname(os.path.join(os.path.abspath(frame.f_globals["__file__"]), path, *rest))
+    dir = os.path.join(os.path.dirname(os.path.abspath(frame.f_globals["__file__"])), path, *rest)
     if dir not in pathlist:
         if pos is None:
             pathlist.append(dir)
