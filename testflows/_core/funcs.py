@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
+import os
 import inspect
-import time
+import importlib
 import threading
 
 from .exceptions import ResultException
@@ -29,6 +29,43 @@ from .cli.colors import cursor_up as move_cursor_up
 current_test = threading.local()
 current_test.object = None
 current_test.main = None
+
+def load(module, test=None):
+    """Load test from module path.
+
+    :param module: module path
+    :param test: test class or method to load (optional)
+    """
+    module = importlib.import_module(module)
+    if test:
+        test = getattr(module, test, None)
+    if test is None:
+        test = getattr(module, "TestCase", None)
+    if test is None:
+        test = getattr(module, "TestSuite", None)
+    if test is None:
+        test = getattr(module, "Test", None)
+    return test
+
+def append_path(pathlist, path, *rest, **kwargs):
+    """Append path relative to the caller
+    to the path list.
+
+    :param pathlist: path list
+    :param path: path relative to the caller
+    :param *rest: rest of the path
+    :param pos: insert at given position,
+       default: append to the end of the list
+    """
+    pos = kwargs.pop("pos", None)
+    frame = inspect.currentframe().f_back
+    dir = os.path.dirname(os.path.join(os.path.abspath(frame.f_globals["__file__"]), path, *rest))
+    if dir not in pathlist:
+        if pos is None:
+            pathlist.append(dir)
+        else:
+            pathlist.insert(pos, dir)
+    return pathlist
 
 def main(frame=None):
     """Return true if caller is the main module.

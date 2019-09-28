@@ -14,11 +14,9 @@
 import os
 import sys
 import time
-import types
 import inspect
 import functools
 import tempfile
-import importlib
 
 import testflows.settings as settings
 
@@ -634,23 +632,6 @@ class step(_test):
     def __init__(self, name, **kwargs):
         kwargs["type"] = TestType.Step
         return super(step, self).__init__(name, **kwargs)
-
-def load(module, test=None):
-    """Load test from module path.
-
-    :param module: module path
-    :param test: test class or method to load (optional)
-    """
-    module = importlib.import_module(module)
-    if test:
-        test = getattr(module, test, None)
-    if test is None:
-        test = getattr(module, "TestCase", None)
-    if test is None:
-        test = getattr(module, "TestSuite", None)
-    if test is None:
-        test = getattr(module, "Test", None)
-    return test
 
 def run(test, **kwargs):
     """Run a test.
