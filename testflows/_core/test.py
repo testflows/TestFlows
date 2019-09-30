@@ -263,7 +263,7 @@ class Test(object):
                  uid=None, tags=None, attributes=None, requirements=None,
                  users=None, tickets=None, description=None, parent=None,
                  xfails=None, xflags=None, only=None, skip=None,
-                 start=None, end=None, args=None, id=None):
+                 start=None, end=None, args=None, id=None, _frame=None):
         global current_test
 
         self.name = name
@@ -275,7 +275,7 @@ class Test(object):
             if current_test.main is not None:
                 raise RuntimeError("only one top level test is allowed")
             current_test.main = self
-            frame = inspect.currentframe().f_back.f_back.f_back
+            frame = get(_frame, inspect.currentframe().f_back.f_back.f_back)
             if main(frame):
                 cli_args, xflags, only, skip, start, end = self.parse_cli_args(xflags, only, skip, start, end)
 
@@ -290,7 +290,7 @@ class Test(object):
         self.tickets = get(tickets, self.tickets)
         self.description = get(description, self.description)
         self.args = get(args, {})
-        self.args.update(cli_args)
+        self.args.update({k:v for k, v in cli_args.items() if not k.startswith("_")})
         self._process_args()
         self.result = Null(self.name)
         if flags is not None:
@@ -306,8 +306,6 @@ class Test(object):
         self.end = get(end, None)
         self.caller_test = None
 
-        self.init(**self.args)
-
     @classmethod
     def make_name(cls, name, parent=None):
         """Make full name.
@@ -321,7 +319,7 @@ class Test(object):
 
     @classmethod
     def make_tags(cls, tags):
-        return get(tags, cls.tags)
+        return set(get(tags, cls.tags))
 
     def _process_args(self):
         """Process arguments by converting
@@ -365,7 +363,7 @@ class Test(object):
         else:
             if current_test.main is self:
                 init()
-            self.run()
+            self.run(**{name: arg.value for name, arg in self.args.items()})
             return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
@@ -406,10 +404,7 @@ class Test(object):
                     if isinstance(self.result, result):
                         self.result = self.result.xout(reason)
 
-    def init(self, **args):
-        pass
-
-    def run(self):
+    def run(self, **args):
         pass
 
     def bind(self, func):
@@ -657,3 +652,95 @@ def run(test, **kwargs):
         pass
 
     return test.result
+
+# decorators
+class _testdecorator(object):
+    type = test
+    def __init__(self, func):
+        func.name = getattr(func, "name", func.__name__.replace("_", " "))
+        func.description = getattr(func, "description", func.__doc__)
+        self.func = func
+        functools.update_wrapper(self, func)
+
+    def __call__(self, args=None, **kwargs):
+        if args is None:
+            args = {}
+        frame = inspect.currentframe().f_back
+        _kwargs = dict(vars(self.func))
+        _kwargs.update(kwargs)
+        with self.type(**_kwargs, args=args, _frame=frame) as testcase:
+            self.func(**args)
+        return testcase
+
+class testcase(_testdecorator):
+    type = test
+
+class testsuite(_testdecorator):
+    type = suite
+
+class testmodule(_testdecorator):
+    type = module
+
+class name(object):
+    def __init__(self, name):
+        self.name = name
+
+    def __call__(self, func):
+        func.name = self.name
+        return func
+
+class description(object):
+    def __init__(self, description):
+        self.description = description
+
+    def __call__(self, func):
+        func.description = self.description
+        return func
+
+class attributes(object):
+    def __init__(self, *attributes):
+        self.attributes = attributes
+
+    def __call__(self, func):
+        func.attributes = self.attributes
+        return func
+
+class requirements(object):
+    def __init__(self, *requirements):
+        self.requirements = requirements
+
+    def __call__(self, func):
+        func.name = self.name
+        return func
+
+class tags(object):
+    def __init__(self, *tags):
+        self.tags = tags
+
+    def __call__(self, func):
+        func.tags = self.tags
+        return func
+
+class uid(object):
+    def __init__(self, uid):
+        self.uid = uid
+
+    def __call__(self, func):
+        func.uid = self.uid
+        return func
+
+class users(object):
+    def __init__(self, *users):
+        self.users = users
+
+    def __call__(self, func):
+        func.users = self.users
+        return func
+
+class tickets(object):
+    def __init__(self, *tickets):
+        self.tickets = tickets
+
+    def __call__(self, func):
+        func.tickets = self.tickets
+        return func

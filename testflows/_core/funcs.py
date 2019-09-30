@@ -30,6 +30,9 @@ current_test = threading.local()
 current_test.object = None
 current_test.main = None
 
+def thetest():
+    return current_test.object
+
 def load(module, test=None):
     """Load test from module path.
 
@@ -75,6 +78,9 @@ def main(frame=None):
     if frame is None:
         frame = inspect.currentframe().f_back
     return frame.f_globals["__name__"] == "__main__"
+
+class args(dict):
+    pass
 
 def note(message, test=None):
     if test is None:
