@@ -710,7 +710,7 @@ class requirements(object):
         self.requirements = requirements
 
     def __call__(self, func):
-        func.name = self.name
+        func.requirements = self.requirements
         return func
 
 class tags(object):
