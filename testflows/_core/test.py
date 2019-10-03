@@ -28,7 +28,7 @@ from .objects import get, Null, OK, Fail, Skip, Error, Argument
 from .constants import name_sep, id_sep
 from .io import TestIO, LogWriter
 from .name import join, depth, match, absname
-from .funcs import current_test, main, skip, ok, fail, error, exception, pause
+from .funcs import current_test, main, skip, ok, fail, error, exception, pause, load
 from .init import init
 from .cli.arg.parser import ArgumentParser
 from .cli.arg.exit import ExitWithError, ExitException
@@ -628,31 +628,6 @@ class step(_test):
         kwargs["type"] = TestType.Step
         return super(step, self).__init__(name, **kwargs)
 
-def run(test, **kwargs):
-    """Run a test.
-
-    :param test: test class, test function or test module path
-    :param cls: if test is a module path, cls can
-       specify test definition to load (optional)
-    """
-    cls = kwargs.pop("cls", None)
-
-    if inspect.isclass(test) and issubclass(test, Test):
-        test = test
-    elif type(test) is str:
-        return run(load(test, cls), **kwargs)
-    elif inspect.isfunction(test):
-        return test(**kwargs)
-    elif inspect.ismethod(test):
-        return test(**kwargs)
-    else:
-        raise TypeError(f"invalid test type '{type(test)}'")
-
-    with globals()["test"](test=test, name=kwargs.pop("name", None), **kwargs) as test:
-        pass
-
-    return test.result
-
 # decorators
 class _testdecorator(object):
     type = test
@@ -744,3 +719,30 @@ class tickets(object):
     def __call__(self, func):
         func.tickets = self.tickets
         return func
+
+def run(test, **kwargs):
+    """Run a test.
+
+    :param test: test class, test function or test module path
+    :param cls: if test is a module path, cls can
+       specify test definition to load (optional)
+    """
+    cls = kwargs.pop("cls", None)
+
+    if inspect.isclass(test) and issubclass(test, Test):
+        test = test
+    elif issubclass(type(test), _testdecorator):
+        return test(**kwargs)
+    elif type(test) is str:
+        return run(load(test, cls), **kwargs)
+    elif inspect.isfunction(test):
+        return test(**kwargs)
+    elif inspect.ismethod(test):
+        return test(**kwargs)
+    else:
+        raise TypeError(f"invalid test type '{type(test)}'")
+
+    with globals()["test"](test=test, name=kwargs.pop("name", None), **kwargs) as test:
+        pass
+
+    return test.result
