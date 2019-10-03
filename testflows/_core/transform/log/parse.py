@@ -49,7 +49,7 @@ def transform(stop=None):
         message.RawResultXNull # XNULL
     )
     msg = None
-    stop_id = f"{id_sep}{settings.test_id}"
+    stop_id = None
 
     while True:
         if msg is not None:
@@ -57,6 +57,8 @@ def transform(stop=None):
                 fields = json.loads(f"[{msg}]")
                 keyword = fields[prefix.keyword]
                 msg = message_map[keyword](*fields)
+                if stop_id is None:
+                    stop_id = f"{msg.p_id}"
                 if isinstance(msg, message.ResultMessage):
                     if stop and msg.p_id == stop_id:
                         stop.set()

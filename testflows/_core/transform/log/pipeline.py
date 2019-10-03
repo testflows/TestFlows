@@ -16,6 +16,7 @@ import threading
 from .read import transform as read_transform
 from .parse import transform as parse_transform
 from .nice import transform as nice_transform
+from .dots import transform as dots_transform
 from .write import transform as write_transform
 from .stop import transform as stop_transform
 from .raw import transform as raw_transform
@@ -81,3 +82,16 @@ class NiceLogPipeline(Pipeline):
             stop_transform(stop_event)
         ]
         super(NiceLogPipeline, self).__init__(steps)
+
+class DotsLogPipeline(Pipeline):
+    def __init__(self, input, output, tail=False):
+        stop_event = threading.Event()
+
+        steps = [
+            read_transform(input, tail=tail),
+            parse_transform(stop_event),
+            dots_transform(stop_event),
+            write_transform(output),
+            stop_transform(stop_event)
+        ]
+        super(DotsLogPipeline, self).__init__(steps)

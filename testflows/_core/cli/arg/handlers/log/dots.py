@@ -11,23 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import testflows._core.cli.arg.type as argtype
+
 from testflows._core.cli.arg.common import epilog
 from testflows._core.cli.arg.common import HelpFormatter
 from testflows._core.cli.arg.handlers.handler import Handler as HandlerBase
-from testflows._core.cli.arg.handlers.log.nice import Handler as nice_handler
-from testflows._core.cli.arg.handlers.log.short import Handler as short_handler
-from testflows._core.cli.arg.handlers.log.dots import Handler as dots_handler
+from testflows._core.transform.log.pipeline import DotsLogPipeline
 
 class Handler(HandlerBase):
     @classmethod
     def add_command(cls, commands):
-        parser = commands.add_parser("log", help="log processing", epilog=epilog(),
-            description="Work with logs.",
+        parser = commands.add_parser("dots", help="dots transform", epilog=epilog(),
+            description="Transform log into a dots format.",
             formatter_class=HelpFormatter)
 
-        log_commands = parser.add_subparsers(title="commands", metavar="command",
-            description=None, help=None)
-        log_commands.required = True
-        nice_handler.add_command(log_commands)
-        short_handler.add_command(log_commands)
-        dots_handler.add_command(log_commands)
+        parser.add_argument("input", metavar="input", type=argtype.file("r", bufsize=1, encoding="utf-8"),
+                nargs="?", help="input log, default: stdin", default="-")
+        parser.add_argument("output", metavar="output", type=argtype.file("w", bufsize=1, encoding="utf-8"),
+                nargs="?", help='output file, default: stdout', default="-")
+
+        parser.set_defaults(func=cls())
+
+    def handle(self, args):
+        DotsLogPipeline(args.input, args.output).run()

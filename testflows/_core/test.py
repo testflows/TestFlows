@@ -159,8 +159,8 @@ class Test(object):
             help="disable terminal color highlighting", default=False)
         parser.add_argument("--id", metavar="id", dest="_id", type=str, help="custom test id")
         parser.add_argument("-o", "--output", dest="_output", metavar="format", type=str,
-            choices=["nice", "quiet", "short", "raw", "silent"], default="nice",
-            help="""stdout output format, choices are: ['nice','short','quiet','raw','silent'],
+            choices=["nice", "quiet", "short", "dots", "raw", "silent"], default="nice",
+            help="""stdout output format, choices are: ['nice','short','dots','quiet','raw','silent'],
                 default: 'nice'""")
         parser.add_argument("-l", "--log", dest="_log", metavar="file", type=str,
             help="path to the log file where test output will be stored, default: uses temporary log file")

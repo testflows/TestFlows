@@ -22,6 +22,7 @@ import testflows.settings as settings
 
 from .transform.log.pipeline import RawLogPipeline
 from .transform.log.pipeline import NiceLogPipeline
+from .transform.log.pipeline import DotsLogPipeline
 from .transform.log.pipeline import ShortLogPipeline
 
 def cleanup():
@@ -83,6 +84,14 @@ def stdout_nice_handler():
         log.seek(0)
         NiceLogPipeline(log, sys.stdout, tail=True).run()
 
+def stdout_dots_handler():
+    """Handler to output messages to sys.stdout
+    using "dots" format.
+    """
+    with open(settings.read_logfile, "a+", buffering=1, encoding="utf-8") as log:
+        log.seek(0)
+        DotsLogPipeline(log, sys.stdout, tail=True).run()
+
 def stdout_silent_handler():
     """Handler that prints no output to sys.stdout.
     """
@@ -98,7 +107,8 @@ def init():
         "nice": stdout_nice_handler,
         "silent": stdout_silent_handler,
         "quiet": stdout_silent_handler,
-        "short": stdout_short_handler
+        "short": stdout_short_handler,
+        "dots": stdout_dots_handler,
     }
     # start stdout output handler
     handler = threading.Thread(target=output_handler_map[settings.output_format])
