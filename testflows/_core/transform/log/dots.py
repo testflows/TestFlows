@@ -26,7 +26,7 @@ def color_result(result):
     elif result == "OK":
         return color(".", "green", attrs=["bold"])
     elif result == "Skip":
-        return color("-", "cyan", attrs=["bold"])
+        return color("-", "white", attrs=["dim"])
     # Error, Fail, Null
     elif result == "Error":
         return color("E", "yellow", attrs=["bold"])
