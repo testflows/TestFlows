@@ -30,6 +30,7 @@ setup(
         "testflows._core.utils",
         "testflows._core.transform",
         "testflows._core.transform.log",
+        "testflows._core.transform.log.report",
         "testflows._core.document",
         "testflows._core.cli",
         "testflows._core.cli.arg",

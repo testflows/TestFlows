@@ -21,6 +21,8 @@ from .write import transform as write_transform
 from .stop import transform as stop_transform
 from .raw import transform as raw_transform
 from .short import transform as short_transform
+from .report.fails import transform as fails_report_transform
+from .report.totals import transform as totals_report_transform
 
 class Pipeline(object):
     """Combines multiple steps into a pipeline
@@ -45,6 +47,34 @@ class Pipeline(object):
             except StopIteration:
                 break
 
+def fanout(*steps):
+    """Single step of pipeline
+    that feeds the same input to
+    multiple steps and produces
+    a list of outputs from each step.
+
+    :param *steps: fan out steps
+    """
+    item = None
+    outputs = []
+    while True:
+        for step in steps:
+            output = step.send(item)
+            if output is not None:
+                outputs.append(output)
+        item = yield outputs or None
+        outputs = []
+
+def fanin(combinator):
+    """Combine multiple outputs into one.
+    using the combinator
+    """
+    item = None
+    while True:
+        if item is not None:
+            item = combinator(item)
+        item = yield item
+
 class RawLogPipeline(Pipeline):
     def __init__(self, input, output, tail=False):
         stop_event = threading.Event()
@@ -64,7 +94,14 @@ class ShortLogPipeline(Pipeline):
         steps = [
             read_transform(input, tail=tail),
             parse_transform(stop_event),
-            short_transform(),
+            fanout(
+                short_transform(),
+                fails_report_transform(stop_event),
+                totals_report_transform(stop_event)
+            ),
+            fanin(
+                "".join
+            ),
             write_transform(output),
             stop_transform(stop_event)
         ]
@@ -77,7 +114,14 @@ class NiceLogPipeline(Pipeline):
         steps = [
             read_transform(input, tail=tail),
             parse_transform(stop_event),
-            nice_transform(stop_event),
+            fanout(
+                nice_transform(stop_event),
+                fails_report_transform(stop_event),
+                totals_report_transform(stop_event),
+            ),
+            fanin(
+                "".join
+            ),
             write_transform(output),
             stop_transform(stop_event)
         ]
@@ -90,7 +134,14 @@ class DotsLogPipeline(Pipeline):
         steps = [
             read_transform(input, tail=tail),
             parse_transform(stop_event),
-            dots_transform(stop_event),
+            fanout(
+                dots_transform(stop_event),
+                fails_report_transform(stop_event),
+                totals_report_transform(stop_event)
+            ),
+            fanin(
+                "".join
+            ),
             write_transform(output),
             stop_transform(stop_event)
         ]

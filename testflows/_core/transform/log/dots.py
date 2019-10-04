@@ -44,7 +44,7 @@ def format_result(msg, result):
         return
 
     count += 1
-    _result = f"{color_result(result)}"
+    _result = f"\b{color_result(result)} "
     # wrap if we hit max width
     if count >= width:
         count = 0
@@ -67,14 +67,19 @@ formatters = {
 def transform(stop_event):
     """Transform parsed log line into a short format.
     """
+    n = 0
     line = None
+    progress = ["\\", "|", "/"]
     while True:
         if line is not None:
             formatter = formatters.get(type(line), None)
             if formatter:
                 line = formatter[0](line, *formatter[1:])
+                n = 0
             else:
-                line = None
+                line = "\b" + color(progress[n % 3], "white", attrs=["dim"])
+                n += 1
+
         if stop_event.is_set():
             if line is None:
                 line = ""

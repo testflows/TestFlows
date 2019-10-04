@@ -381,6 +381,8 @@ class Test(object):
                     exception(test=self)
                     self.result = Error(self.name,
                         "unexpected %s: %s" % (exception_type.__name__, str(exception_value).split('\n', 1)[0]))
+                    if isinstance(exception_value, KeyboardInterrupt):
+                        raise self.result
             else:
                 if isinstance(self.result, Null):
                     self.result = OK(self.name)
