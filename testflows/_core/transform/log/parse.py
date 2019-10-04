@@ -46,7 +46,9 @@ def transform(stop=None):
         message.RawResultXOK, #XOK
         message.RawResultXFail, # XFAIL
         message.RawResultXError, # XERROR
-        message.RawResultXNull # XNULL
+        message.RawResultXNull, # XNULL
+        message.RawProtocol, # PROTOCOL
+        message.RawInput, # INPUT
     )
     msg = None
     stop_id = None

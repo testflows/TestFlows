@@ -17,7 +17,7 @@ from testflows._core.flags import Flags, SKIP
 from testflows._core.testtype import TestType
 from testflows._core.transform.log import message
 from testflows._core.name import split
-from testflows._core.cli.colors import color
+from testflows._core.cli.colors import color, cursor_up
 
 indent = " " * 2
 
@@ -36,6 +36,14 @@ def color_result(result):
         return color(result, "cyan", attrs=["bold"])
     # Error, Fail, Null
     return color(result, "red", attrs=["bold"])
+
+def format_input(msg, keyword):
+    flags = Flags(msg.p_flags)
+    if flags & SKIP and settings.show_skipped is False:
+        return
+    out = f"{indent * (msg.p_id.count('/'))}"
+    out += color("\u270b " + msg.message, "yellow", attrs=["bold"]) + cursor_up() + "\n"
+    return out
 
 def format_test(msg, keyword):
     flags = Flags(msg.p_flags)
@@ -64,6 +72,7 @@ def format_result(msg, result):
     return f"{indent * (msg.p_id.count('/') - 1)}{_result}\n"
 
 formatters = {
+    message.RawInput: (format_input, f""),
     message.RawTest: (format_test, f""),
     message.RawResultOK: (format_result, f"OK"),
     message.RawResultFail: (format_result, f"Fail"),

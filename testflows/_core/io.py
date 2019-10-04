@@ -29,6 +29,7 @@ class TestOutput(object):
     :param io: message IO
     """
     rstrip_nulls = re.compile(r'(,null)+$')
+    protocol_version = "TFSPv1"
 
     def __init__(self, test, io):
         self.io = io
@@ -59,6 +60,20 @@ class TestOutput(object):
         self.msg_count += 1
         self.msg_hash = msg_hash
         self.io.write(f"{keyword},\"{msg_hash}\",{msg}")
+
+    def protocol(self):
+        """Output protocol version message.
+        """
+        msg = dumps(str(self.protocol_version))
+        self.message(Message.PROTOCOL, msg)
+
+    def input(self, message):
+        """Output input message.
+
+        :param message: message
+        """
+        msg = dumps(str(message))
+        self.message(Message.INPUT, msg)
 
     def exception(self):
         """Output exception message.

@@ -22,7 +22,7 @@ from testflows._core.transform.log import message
 from testflows._core.utils.timefuncs import strftime, strftimedelta
 from testflows._core.utils.timefuncs import localfromtimestamp
 from testflows._core.name import split, basename
-from testflows._core.cli.colors import color
+from testflows._core.cli.colors import color, cursor_up
 
 strip_nones = re.compile(r'( None)+$')
 indent = " " * 2
@@ -42,6 +42,14 @@ def color_result(prefix, result):
         return color(prefix + result, "cyan", attrs=["bold"])
     # Error, Fail, Null
     return color(prefix + result, "red", attrs=["bold"])
+
+def format_input(msg, keyword):
+    flags = Flags(msg.p_flags)
+    if flags & SKIP and settings.show_skipped is False:
+        return
+    out = color_other(f"{strftimedelta(msg.p_time):>20}{'':3}{indent * (msg.p_id.count('/') - 1)}{keyword}")
+    out += color("\u270b " + msg.message, "yellow", attrs=["bold"]) + cursor_up() + "\n"
+    return out
 
 def format_test(msg, keyword):
     flags = Flags(msg.p_flags)
@@ -90,6 +98,7 @@ mark = "\u27e5"
 result_mark = "\u27e5\u27e4"
 
 formatters = {
+    message.RawInput: (format_input, f"{mark} "),
     message.RawTest: (format_test, f"{mark}  "),
     message.RawDescription: (format_other, f"{mark}    :"),
     message.RawArgument: (format_other, f"{mark}    @"),

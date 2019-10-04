@@ -24,6 +24,12 @@ def namedtuple_with_defaults(*args, defaults=()):
 class Message(object):
     __slots__ = ()
 
+class ProtocolMessage(Message):
+    pass
+
+class InputMessage(Message):
+    pass
+
 class NoteMessage(Message):
     pass
 
@@ -209,4 +215,14 @@ class RawTrace(RawFormat, TraceMessage, namedtuple_with_defaults(
 class RawDebug(RawFormat, DebugMessage, namedtuple_with_defaults(
         "RawDebugMessage",
         RawFormat.prefix.fields + "message")):
+    pass
+
+class RawInput(RawFormat, InputMessage, namedtuple_with_defaults(
+        "RawInputMessage",
+        RawFormat.prefix.fields + "message")):
+    pass
+
+class RawProtocol(RawFormat, ProtocolMessage, namedtuple_with_defaults(
+        "RawDebugMessage",
+        RawFormat.prefix.fields + "version")):
     pass

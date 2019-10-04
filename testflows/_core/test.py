@@ -350,6 +350,8 @@ class Test(object):
 
     def __enter__(self):
         self.io = TestIO(self)
+        if current_test.main is self:
+            self.io.output.protocol()
         self.io.output.test_message()
 
         if self.flags & PAUSE_BEFORE:

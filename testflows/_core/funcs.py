@@ -170,5 +170,5 @@ def xnull(test=None):
 def pause(test=None):
     if test is None:
         test = current_test.object
-    message(reset_colors() + warning("\u270b Paused, enter any key to continue...", eol="") + move_cursor_up())
+    test.io.output.input("Paused, enter any key to continue...")
     input()
