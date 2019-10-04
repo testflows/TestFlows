@@ -21,40 +21,24 @@ from testflows._core.cli.colors import color
 
 indent = " " * 2
 
-def color_result(result, text):
+def color_result(result, text, attrs=None):
+    if attrs is None:
+        attrs = []
     if result.startswith("X"):
-        return color("\u2718 " + text, "blue", attrs=["bold"])
+        return color("\u2718 " + text, "blue", attrs=attrs)
     elif result == "OK":
-        return color("\u2714" + text, "green", attrs=["bold"])
+        return color("\u2714" + text, "green", attrs=attrs)
     elif result == "Skip":
-        return color("\u2704" + text, "cyan", attrs=["bold"])
+        return color("\u2704" + text, "cyan", attrs=attrs)
     # Error, Fail, Null
     elif result == "Error":
-        return color("\u2718 " + text, "yellow", attrs=["bold"])
+        return color("\u2718 " + text, "yellow", attrs=attrs)
     elif result == "Fail":
-         return color("\u2718 " + text, "red", attrs=["bold"])
+         return color("\u2718 " + text, "red", attrs=attrs)
     elif result == "Null":
-        return color("\u2718 " + text, "magenta", attrs=["bold"])
+        return color("\u2718 " + text, "magenta", attrs=attrs)
     else:
         raise ValueError(f"unknown result {result}")
-
-def format_test(msg, keyword):
-    flags = Flags(msg.p_flags)
-    if flags & SKIP and settings.show_skipped is False:
-        return
-
-    if msg.p_type == TestType.Module:
-        keyword += "Module"
-    elif msg.p_type == TestType.Suite:
-        keyword += "Suite"
-    elif msg.p_type == TestType.Step:
-        keyword += "Step"
-    else:
-        keyword += "Test"
-
-    _keyword = color_keyword(keyword)
-    _name = color_test_name(split(msg.name)[-1])
-    return f"{indent * (msg.p_id.count('/') - 1)}{_keyword} {_name}\n"
 
 def add_result(msg, results, result):
     flags = Flags(msg.p_flags)
