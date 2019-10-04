@@ -23,7 +23,6 @@ from testflows._core.utils.timefuncs import strftime, strftimedelta
 from testflows._core.utils.timefuncs import localfromtimestamp
 from testflows._core.name import split, basename
 from testflows._core.cli.colors import color
-from testflows._core import __version__
 
 strip_nones = re.compile(r'( None)+$')
 indent = " " * 2
@@ -118,9 +117,7 @@ def transform(stop):
 
     :param stop: stop event
     """
-    n = 0
     line = None
-    divider = "\u2500" * 20
 
     while True:
         if line is not None:
@@ -131,12 +128,4 @@ def transform(stop):
             else:
                 line = None
 
-            if n < 1:
-                line = color_other(f"TestFlows Test Framework v{__version__}\n{divider}\n") + (line or "")
-
-            if stop.is_set():
-                if line is None:
-                    line = ""
-                line += color_other(f"{divider}\n")
-            n += 1
         line = yield line

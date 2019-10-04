@@ -23,6 +23,7 @@ from .raw import transform as raw_transform
 from .short import transform as short_transform
 from .report.fails import transform as fails_report_transform
 from .report.totals import transform as totals_report_transform
+from .report.version import transform as version_report_transform
 
 class Pipeline(object):
     """Combines multiple steps into a pipeline
@@ -97,7 +98,8 @@ class ShortLogPipeline(Pipeline):
             fanout(
                 short_transform(),
                 fails_report_transform(stop_event),
-                totals_report_transform(stop_event)
+                totals_report_transform(stop_event),
+                version_report_transform(stop_event),
             ),
             fanin(
                 "".join
@@ -118,6 +120,7 @@ class NiceLogPipeline(Pipeline):
                 nice_transform(stop_event),
                 fails_report_transform(stop_event),
                 totals_report_transform(stop_event),
+                version_report_transform(stop_event),
             ),
             fanin(
                 "".join
@@ -137,7 +140,8 @@ class DotsLogPipeline(Pipeline):
             fanout(
                 dots_transform(stop_event),
                 fails_report_transform(stop_event),
-                totals_report_transform(stop_event)
+                totals_report_transform(stop_event),
+                version_report_transform(stop_event),
             ),
             fanin(
                 "".join
