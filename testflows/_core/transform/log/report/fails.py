@@ -23,11 +23,11 @@ indent = " " * 2
 
 def color_result(result, text):
     if result.startswith("X"):
-        return color(text, "blue", attrs=["bold"])
+        return color("\u2718 " + text, "blue", attrs=["bold"])
     elif result == "OK":
-        return color(text, "green", attrs=["bold"])
+        return color("\u2714" + text, "green", attrs=["bold"])
     elif result == "Skip":
-        return color(text, "cyan", attrs=["bold"])
+        return color("\u2704" + text, "cyan", attrs=["bold"])
     # Error, Fail, Null
     elif result == "Error":
         return color("\u2718 " + text, "yellow", attrs=["bold"])
@@ -60,7 +60,7 @@ def add_result(msg, results, result):
     flags = Flags(msg.p_flags)
     if flags & SKIP and settings.show_skipped is False:
         return
-    if not result.startswith("X") and not result in ("OK", "Skip"):
+    if not result in ("OK", "Skip"):
         results[msg.p_id] = (msg, result)
 
 processors = {
@@ -79,11 +79,30 @@ def generate(results):
     """Generate report"""
     if not results:
         return
-    report = color("\nFailing tests\n\n", "red", attrs=["bold"])
+
+    xfails = ""
+    fails = ""
+
     for entry in results:
         msg, result = results[entry]
-        report += f"{color_result(result, result + ' ' + msg.test)}\n"
-    return report
+        if not result.startswith("X"):
+            continue
+        xfails += f"{color_result(result, result + ' ' + msg.test)}\n"
+
+    if xfails:
+        xfails = color("\nKnown failing tests\n\n", "blue", attrs=["bold"]) + xfails
+
+    for entry in results:
+        msg, result = results[entry]
+        if result.startswith("X"):
+            continue
+        fails += f"{color_result(result, result + ' ' + msg.test)}\n"
+    if fails:
+        fails = color("\nFailing tests\n\n", "red", attrs=["bold"]) + fails
+
+    report = f"{xfails}{fails}"
+
+    return report or None
 
 def transform(stop):
     """Transform parsed log line into a short format.
