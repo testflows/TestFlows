@@ -14,7 +14,7 @@
 import testflows.settings as settings
 
 from testflows._core.flags import Flags, SKIP
-from testflows._core.testtype import TestType
+from testflows._core.testtype import TestType, TestSubType
 from testflows._core.transform.log import message
 from testflows._core.utils.timefuncs import strftimedelta
 from testflows._core.cli.colors import color
@@ -57,7 +57,7 @@ class Counts(object):
         return self.units > 0
 
     def __str__(self):
-        s = f"{self.units} {self.name} ("
+        s = f"{self.units} {self.name if self.units != 1 else self.name.rstrip('s')} ("
         s = color(s, "white", attrs=["bold"])
         r = []
         if self.ok > 0:
@@ -93,7 +93,12 @@ def format_test(msg, counts):
     elif msg.p_type == TestType.Step:
         counts["step"].units += 1
     else:
-        counts["test"].units += 1
+        if msg.p_subtype == TestSubType.Feature:
+            counts["feature"].units += 1
+        elif msg.p_subtype == TestSubType.Scenario:
+            counts["scenario"].units += 1
+        else:
+            counts["test"].units += 1
 
 def format_result(msg, counts):
     if Flags(msg.p_flags) & SKIP and settings.show_skipped is False:
@@ -120,7 +125,12 @@ def format_result(msg, counts):
     elif msg.p_type == TestType.Step:
         setattr(counts["step"], _name, getattr(counts["step"], _name) + 1)
     else:
-        setattr(counts["test"], _name, getattr(counts["test"], _name) + 1)
+        if msg.p_subtype == TestSubType.Feature:
+            setattr(counts["feature"], _name, getattr(counts["feature"], _name) + 1)
+        elif msg.p_subtype == TestSubType.Scenario:
+            setattr(counts["scenario"], _name, getattr(counts["scenario"], _name) + 1)
+        else:
+            setattr(counts["test"], _name, getattr(counts["test"], _name) + 1)
 
 formatters = {
     message.RawTest: (format_test,),
@@ -144,7 +154,9 @@ def transform(stop):
         "module": Counts("modules", *([0] * 10)),
         "suite": Counts("suites", *([0] * 10)),
         "test": Counts("tests", *([0] * 10)),
-        "step": Counts("steps", *([0] * 10))
+        "step": Counts("steps", *([0] * 10)),
+        "feature": Counts("features", *([0] * 10)),
+        "scenario": Counts("scenarios", *([0] * 10))
     }
     line = None
 
@@ -167,6 +179,10 @@ def transform(stop):
                     line += line_icon + str(counts["suite"])
                 if counts["test"]:
                     line += line_icon + str(counts["test"])
+                if counts["feature"]:
+                    line += line_icon + str(counts["feature"])
+                if counts["scenario"]:
+                    line += line_icon + str(counts["scenario"])
                 if counts["step"]:
                     line += line_icon + str(counts["step"])
                 line += color_line(f"\nTotal time {strftimedelta(msg.p_time)}\n")

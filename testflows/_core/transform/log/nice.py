@@ -17,7 +17,7 @@ import textwrap
 import testflows.settings as settings
 
 from testflows._core.flags import Flags, SKIP
-from testflows._core.testtype import TestType
+from testflows._core.testtype import TestType, TestSubType
 from testflows._core.transform.log import message
 from testflows._core.utils.timefuncs import strftime, strftimedelta
 from testflows._core.utils.timefuncs import localfromtimestamp
@@ -60,9 +60,23 @@ def format_test(msg, keyword):
     elif msg.p_type == TestType.Suite:
         keyword += "Suite"
     elif msg.p_type == TestType.Step:
-        keyword += "Step"
+        if msg.p_subtype == TestSubType.Given:
+            keyword += "Given"
+        elif msg.p_subtype == TestSubType.When:
+            keyword += "When"
+        elif msg.p_subtype == TestSubType.Then:
+            keyword += "Then"
+        else:
+            keyword += "Step"
     else:
-        keyword += "Test"
+        if msg.p_subtype == TestSubType.Feature:
+            keyword += "Feature"
+        elif msg.p_subtype == TestSubType.Scenario:
+            keyword += "Scenario"
+        elif msg.p_subtype == TestSubType.Background:
+            keyword += "Background"
+        else:
+            keyword += "Test"
 
     started = strftime(localfromtimestamp(msg.started))
     _keyword = color_keyword(keyword)

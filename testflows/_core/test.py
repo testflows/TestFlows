@@ -23,7 +23,7 @@ import testflows.settings as settings
 from .exceptions import DummyTestException, ArgumentError, ResultException
 from .flags import Flags, SKIP, TE, FAIL_NOT_COUNTED, ERROR_NOT_COUNTED, NULL_NOT_COUNTED
 from .flags import CFLAGS, PAUSE_BEFORE, PAUSE_AFTER
-from .testtype import TestType
+from .testtype import TestType, TestSubType
 from .objects import get, Null, OK, Fail, Skip, Error, Argument
 from .constants import name_sep, id_sep
 from .io import TestIO, LogWriter
@@ -115,6 +115,8 @@ class Test(object):
     description = None
     flags = Flags()
     name_sep = "."
+    type = TestType.Test
+    subtype = TestSubType.Empty
 
     @classmethod
     def argparser(cls):
@@ -259,7 +261,7 @@ class Test(object):
 
         return args, xflags, only, skip, start, end
 
-    def __init__(self, name=None, flags=None, cflags=None, type=None,
+    def __init__(self, name=None, flags=None, cflags=None, type=None, subtype=None,
                  uid=None, tags=None, attributes=None, requirements=None,
                  users=None, tickets=None, description=None, parent=None,
                  xfails=None, xflags=None, only=None, skip=None,
@@ -295,7 +297,8 @@ class Test(object):
         self.result = Null(self.name)
         if flags is not None:
             self.flags = Flags(flags)
-        self.type = get(type, TestType.Test)
+        self.type = get(type, self.type)
+        self.subtype = get(subtype, self.subtype)
         self.cflags = Flags(cflags) | (self.flags & CFLAGS)
         self.uid = get(uid, self.uid)
         self.xfails = get(xfails, {})
@@ -632,6 +635,32 @@ class step(_test):
         kwargs["type"] = TestType.Step
         return super(step, self).__init__(name, **kwargs)
 
+# support for BDD
+class feature(test):
+    def __init__(self, name, **kwargs):
+        kwargs["subtype"] = TestSubType.Feature
+        return super(feature, self).__init__(name, **kwargs)
+
+class scenario(test):
+    def __init__(self, name, **kwargs):
+        kwargs["subtype"] = TestSubType.Scenario
+        return super(scenario, self).__init__(name, **kwargs)
+
+class given(step):
+    def __init__(self, name, **kwargs):
+        kwargs["subtype"] = TestSubType.Given
+        return super(given, self).__init__(name, **kwargs)
+
+class when(step):
+    def __init__(self, name, **kwargs):
+        kwargs["subtype"] = TestSubType.When
+        return super(when, self).__init__(name, **kwargs)
+
+class then(step):
+    def __init__(self, name, **kwargs):
+        kwargs["subtype"] = TestSubType.Then
+        return super(then, self).__init__(name, **kwargs)
+
 # decorators
 class _testdecorator(object):
     type = test
@@ -644,8 +673,11 @@ class _testdecorator(object):
     def __call__(self, args=None, **kwargs):
         if args is None:
             args = {}
-        frame = inspect.currentframe().f_back
+        frame = kwargs.pop("_frame", inspect.currentframe().f_back)
         _kwargs = dict(vars(self.func))
+        _name = kwargs.pop("name", None)
+        if _name is not None:
+            kwargs["name"] = _name % (_kwargs)
         _kwargs.update(kwargs)
         with self.type(**_kwargs, args=args, _frame=frame) as testcase:
             self.func(**args)
@@ -653,6 +685,12 @@ class _testdecorator(object):
 
 class testcase(_testdecorator):
     type = test
+
+class testscenario(testcase):
+    type = scenario
+
+class testfeature(testcase):
+    type = feature
 
 class testsuite(_testdecorator):
     type = suite
@@ -736,7 +774,7 @@ def run(test, **kwargs):
     if inspect.isclass(test) and issubclass(test, Test):
         test = test
     elif issubclass(type(test), _testdecorator):
-        return test(**kwargs)
+        return test(**kwargs, _frame=inspect.currentframe().f_back)
     elif type(test) is str:
         return run(load(test, cls), **kwargs)
     elif inspect.isfunction(test):

@@ -98,8 +98,8 @@ class XNullMessage(ResultMessage):
 
 class Prefix(object):
     __slots__ = ()
-    fields = "p_keyword p_hash p_num p_type p_id p_name p_flags p_cflags p_stream p_time "
-    keyword, hash, num, type, id, name, flags, cflags, stream, time = list(range(0, 10))
+    fields = "p_keyword p_hash p_num p_type p_subtype, p_id p_name p_flags p_cflags p_stream p_time "
+    keyword, hash, num, type, subtype, id, name, flags, cflags, stream, time = list(range(0, 11))
 
 class RawFormat():
     prefix = Prefix

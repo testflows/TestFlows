@@ -38,6 +38,7 @@ class TestOutput(object):
         self.msg_count = 0
         self.prefix = dumps([
             int(self.test.type),
+            int(self.test.subtype),
             id_sep + id_sep.join(str(n) for n in self.test.id),
             self.test.name,
             int(self.test.flags),

@@ -17,3 +17,14 @@ class TestType(object):
     Suite = 3
     Test = 2
     Step = 1
+
+class TestSubType(object):
+    """Test behaviour subtype."""
+    Feature = 6
+    Scenario = 5
+    Background = 4
+    Given = 3
+    When = 2
+    Then = 1
+    Empty = 0
+
