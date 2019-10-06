@@ -639,27 +639,27 @@ class step(_test):
 class feature(test):
     def __init__(self, name, **kwargs):
         kwargs["subtype"] = TestSubType.Feature
-        return super(feature, self).__init__(name, **kwargs)
+        return super(feature, self).__init__(name,  _frame=inspect.currentframe().f_back, **kwargs)
 
 class scenario(test):
     def __init__(self, name, **kwargs):
         kwargs["subtype"] = TestSubType.Scenario
-        return super(scenario, self).__init__(name, **kwargs)
+        return super(scenario, self).__init__(name, _frame=inspect.currentframe().f_back, **kwargs)
 
 class given(step):
     def __init__(self, name, **kwargs):
         kwargs["subtype"] = TestSubType.Given
-        return super(given, self).__init__(name, **kwargs)
+        return super(given, self).__init__(name,  _frame=inspect.currentframe().f_back, **kwargs)
 
 class when(step):
     def __init__(self, name, **kwargs):
         kwargs["subtype"] = TestSubType.When
-        return super(when, self).__init__(name, **kwargs)
+        return super(when, self).__init__(name,  _frame=inspect.currentframe().f_back, **kwargs)
 
 class then(step):
     def __init__(self, name, **kwargs):
         kwargs["subtype"] = TestSubType.Then
-        return super(then, self).__init__(name, **kwargs)
+        return super(then, self).__init__(name,  _frame=inspect.currentframe().f_back, **kwargs)
 
 # decorators
 class _testdecorator(object):
