@@ -21,9 +21,7 @@ from .serialize import dumps
 from .message import Message
 from .objects import OK, Fail, Error, Skip, Null
 from .objects import XOK, XFail, XError, XNull
-from .cli.text import warning
-from .cli.colors import reset as reset_colors
-from .cli.colors import cursor_up as move_cursor_up
+from .testtype import TestSubType
 
 #: current test handle
 current_test = threading.local()
@@ -172,3 +170,10 @@ def pause(test=None):
         test = current_test.object
     test.io.output.input("Paused, enter any key to continue...")
     input()
+
+def enter_context(cm, test=None):
+    if test is None:
+        test = current_test.object
+    if not test.caller_test or test.caller_test.subtype != TestSubType.Background:
+        raise TypeError("not inside a background test")
+    return test.caller_test.stack.enter_context(cm)

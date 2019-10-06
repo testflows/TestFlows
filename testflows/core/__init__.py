@@ -15,7 +15,7 @@ from testflows._core.test import Test, module, suite, test, step, run
 from testflows._core.test import testcase, testsuite, testmodule
 from testflows._core.test import attributes, requirements, users, tickets
 from testflows._core.test import name, description, uid, tags
-from testflows._core.test import feature, scenario, given, when, then
+from testflows._core.test import feature, background, scenario, given, when, then
 from testflows._core.test import testfeature, testscenario
 from testflows._core.funcs import *
 from testflows._core.filters import the
