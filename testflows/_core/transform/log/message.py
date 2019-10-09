@@ -42,9 +42,6 @@ class TraceMessage(Message):
 class NoneMessage(Message):
     pass
 
-class UserMessage(Message):
-    pass
-
 class ExceptionMessage(Message):
     pass
 
@@ -52,18 +49,6 @@ class ValueMessage(Message):
     pass
 
 class TestMessage(Message):
-    pass
-
-class DescriptionMessage(Message):
-    pass
-
-class ArgumentMessage(Message):
-    pass
-
-class AttributeMessage(Message):
-    pass
-
-class RequirementMessage(Message):
     pass
 
 class ResultMessage(Message):
@@ -121,30 +106,67 @@ class RawException(RawFormat, ExceptionMessage, namedtuple_with_defaults(
 
 class RawTest(RawFormat, TestMessage, namedtuple_with_defaults(
         "RawTestMessage",
-        RawFormat.prefix.fields + "name started flags uid description attributes requirements args",
-        defaults=(None, None, None, [], [], []))):
+        RawFormat.prefix.fields + "name started flags uid description attributes requirements " +
+            "args tags users tickets",
+        defaults=(None, None, None, [], [], [], [], [], []))):
+
+    def __new__(cls, *args):
+        args = list(args)
+        l = len(args)
+        if l > 15 and args[15]: # description
+            args[15] = RawDescription(args[15])
+        if l > 16 and args[16]: # attributes
+            args[16] = [RawAttribute(*attr) for attr in args[16]]
+        if l > 17 and args[17]: # requirements
+            args[17] = [RawRequirement(*req) for req in args[17]]
+        if l > 18 and args[18]: # args
+            args[18] = [RawArgument(*arg) for arg in args[18]]
+        if l > 19 and args[19]: # tags
+            args[19] = [RawTag(*tag) for tag in args[19]]
+        if l > 20 and args[20]: # users
+            args[20] = [RawUser(*user) for user in args[20]]
+        if l > 21 and args[21]:  # tickets
+            args[21] = [RawTicket(*ticket) for ticket in args[21]]
+        return super(RawTest, cls).__new__(cls, *args)
+
+class RawDescription(namedtuple_with_defaults(
+        "RawDescription",
+        "description")):
     pass
 
-class RawDescription(RawFormat, DescriptionMessage, namedtuple_with_defaults(
-        "RawDescriptionMessage",
-        RawFormat.prefix.fields + "description")):
+class RawTag(namedtuple_with_defaults(
+        "RawTag",
+        " ".join(objects.Tag._fields),
+        defaults=objects.Tag._defaults)):
     pass
 
-class RawArgument(RawFormat, ArgumentMessage, namedtuple_with_defaults(
-        "RawArgumentMessage",
-        RawFormat.prefix.fields + " ".join(objects.Argument._fields),
+class RawUser(namedtuple_with_defaults(
+        "RawUser",
+        " ".join(objects.User._fields),
+        defaults=objects.User._defaults)):
+    pass
+
+class RawTicket(namedtuple_with_defaults(
+        "RawTicket",
+        " ".join(objects.Ticket._fields),
+        defaults=objects.Ticket._defaults)):
+    pass
+
+class RawArgument(namedtuple_with_defaults(
+        "RawArgument",
+        " ".join(objects.Argument._fields),
         defaults=objects.Argument._defaults)):
     pass
 
-class RawAttribute(RawFormat, AttributeMessage, namedtuple_with_defaults(
-        "RawAttributeMessage",
-        RawFormat.prefix.fields + " ".join(objects.Attribute._fields),
+class RawAttribute(namedtuple_with_defaults(
+        "RawAttribute",
+        " ".join(objects.Attribute._fields),
         defaults=objects.Attribute._defaults)):
     pass
 
-class RawRequirement(RawFormat, RequirementMessage, namedtuple_with_defaults(
-        "RawRequirementMessage",
-        RawFormat.prefix.fields + " ".join(objects.Requirement._fields),
+class RawRequirement(namedtuple_with_defaults(
+        "RawRequirement",
+        " ".join(objects.Requirement._fields),
         defaults=objects.Requirement._defaults)):
     pass
 

@@ -80,6 +80,14 @@ class Null(Result):
 class XNull(XResult):
     pass
 
+class Tag(TestObject):
+    _fields = ("value",)
+    _defaults = ()
+
+    def __init__(self, value):
+        self.value = value
+        return super(Tag, self).__init__()
+
 class Argument(TestObject):
     _fields = ("name", "value", "group", "type", "uid")
     _defaults = (None,) * 3

@@ -472,7 +472,7 @@ class _test(object):
             parent.child_count += 1
         else:
             name = test.make_name(name)
-        tags = test.make_tags(kwargs.get("tags"))
+        tags = test.make_tags(kwargs.pop("tags", None))
 
         # anchor all patterns
         kwargs["xfails"] = xfails({
@@ -710,11 +710,11 @@ class testcase(_testdecorator):
 class testscenario(testcase):
     type = scenario
 
-class testfeature(testcase):
-    type = feature
-
 class testsuite(_testdecorator):
     type = suite
+
+class testfeature(testsuite):
+    type = feature
 
 class testmodule(_testdecorator):
     type = module

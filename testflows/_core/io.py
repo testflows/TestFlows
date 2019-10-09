@@ -22,6 +22,7 @@ from .serialize import dumps
 from .constants import id_sep, end_of_message
 from .exceptions import exception as get_exception
 from .message import Message
+from .objects import Tag
 
 class TestOutput(object):
     """Test output protocol.
@@ -29,7 +30,7 @@ class TestOutput(object):
     :param io: message IO
     """
     rstrip_nulls = re.compile(r'(,null)+$')
-    protocol_version = "TFSPv1"
+    protocol_version = "TFSPv1.2"
 
     def __init__(self, test, io):
         self.io = io
@@ -112,7 +113,10 @@ class TestOutput(object):
             self.test.description,
             [rstrip_list(object_fields(attr)) for attr in self.test.attributes],
             [rstrip_list(object_fields(req)) for req in self.test.requirements],
-            [rstrip_list(object_fields(arg)) for arg in self.test.args.values()]
+            [rstrip_list(object_fields(arg)) for arg in self.test.args.values()],
+            [rstrip_list(object_fields(Tag(tag))) for tag in self.test.tags],
+            [rstrip_list(object_fields(user)) for user in self.test.users],
+            [rstrip_list(object_fields(ticket)) for ticket in self.test.tickets],
         ]))[1:-1]
         self.message(Message.TEST, msg, rtime=0)
 

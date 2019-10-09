@@ -34,10 +34,6 @@ def transform(stop=None):
         message.RawResultFail, # FAIL
         message.RawResultSkip, # SKIP
         message.RawResultError, # ERROR
-        message.RawAttribute, # ATTRIBUTE
-        message.RawArgument, # ARGUMENT
-        message.RawDescription, # DESCRIPTION
-        message.RawRequirement, # REQUIREMENT
         message.RawException, # EXCEPTION
         message.RawValue, # VALUE
         message.RawNote, # NOTE

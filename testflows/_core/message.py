@@ -22,25 +22,21 @@ class Message(IntEnum):
     FAIL = 4
     SKIP = 5
     ERROR = 6
-    ATTRIBUTE = 7
-    ARGUMENT = 8
-    DESCRIPTION = 9
-    REQUIREMENT = 10
-    EXCEPTION = 11
-    VALUE = 12
-    NOTE = 13
-    DEBUG = 14
-    TRACE = 15
-    XOK = 16
-    XFAIL = 17
-    XERROR = 18
-    XNULL = 19
-    PROTOCOL = 20
-    INPUT = 21
+    EXCEPTION = 7
+    VALUE = 8
+    NOTE = 9
+    DEBUG = 10
+    TRACE = 11
+    XOK = 12
+    XFAIL = 13
+    XERROR = 14
+    XNULL = 15
+    PROTOCOL = 16
+    INPUT = 17
 
 MessageMap = namedtuple(
         "MessageMap",
-        "NONE TEST NULL OK FAIL SKIP ERROR ATTRIBUTE ARGUMENT "
-        "DESCRIPTION REQUIREMENT EXCEPTION VALUE NOTE DEBUG TRACE "
+        "NONE TEST NULL OK FAIL SKIP ERROR "
+        "EXCEPTION VALUE NOTE DEBUG TRACE "
         "XOK XFAIL XERROR XNULL PROTOCOL INPUT"
     )
