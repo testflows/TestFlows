@@ -136,7 +136,7 @@ def format_test(msg, keyword):
     _indent = f"{started:>20}" + f"{'':3}{indent * (msg.p_id.count('/') - 1)}"
     out = f"{color_other(_indent)}{_keyword} {_name}{color_other(', flags:' + str(flags) if flags else '')}\n"
     # convert indent to just spaces
-    _indent = len(_indent) * " "
+    _indent = (len(_indent) + 3) * " "
     if msg.description:
         out += format_description(msg, _indent)
     if msg.tags:
