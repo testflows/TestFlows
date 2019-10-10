@@ -357,6 +357,7 @@ class Test(object):
         self.io = TestIO(self)
         if current_test.main is self:
             self.io.output.protocol()
+            self.io.output.version()
         self.io.output.test_message()
 
         if self.flags & PAUSE_BEFORE:

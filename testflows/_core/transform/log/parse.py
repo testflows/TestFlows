@@ -45,6 +45,7 @@ def transform(stop=None):
         message.RawResultXNull, # XNULL
         message.RawProtocol, # PROTOCOL
         message.RawInput, # INPUT
+        message.RawVersion, # VERSION
     )
     msg = None
     stop_id = None

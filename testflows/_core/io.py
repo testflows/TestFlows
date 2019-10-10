@@ -23,6 +23,7 @@ from .constants import id_sep, end_of_message
 from .exceptions import exception as get_exception
 from .message import Message
 from .objects import Tag
+from . import __version__
 
 class TestOutput(object):
     """Test output protocol.
@@ -68,6 +69,12 @@ class TestOutput(object):
         """
         msg = dumps(str(self.protocol_version))
         self.message(Message.PROTOCOL, msg)
+
+    def version(self):
+        """Output framework version message.
+        """
+        msg = dumps(str(__version__))
+        self.message(Message.VERSION, msg)
 
     def input(self, message):
         """Output input message.

@@ -18,9 +18,10 @@ from argparse import ArgumentParser as ArgumentParserBase
 from .common import epilog
 from .common import description
 from .common import HelpFormatter
-from .handlers.log.handler import Handler as log_handler
+from .handlers.transform.handler import Handler as transform_handler
 from .handlers.document.handler import Handler as document_handler
 from .handlers.requirement.handler import Handler as requirement_handler
+from .handlers.report.handler import Handler as report_handler
 
 from testflows._core import __version__, __license__
 
@@ -45,6 +46,7 @@ parser.add_argument("--license", action="version", help="show program's license 
 
 commands = parser.add_subparsers(title='commands', metavar='command', description=None, help=None)
 
-log_handler.add_command(commands)
+report_handler.add_command(commands)
+transform_handler.add_command(commands)
 requirement_handler.add_command(commands)
 document_handler.add_command(commands)

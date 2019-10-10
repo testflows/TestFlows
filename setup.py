@@ -35,7 +35,8 @@ setup(
         "testflows._core.cli",
         "testflows._core.cli.arg",
         "testflows._core.cli.arg.handlers",
-        "testflows._core.cli.arg.handlers.log",
+        "testflows._core.cli.arg.handlers.report",
+        "testflows._core.cli.arg.handlers.transform",
         "testflows._core.cli.arg.handlers.document",
         "testflows._core.cli.arg.handlers.requirement"
         ],

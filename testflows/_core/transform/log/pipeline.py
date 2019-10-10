@@ -150,3 +150,57 @@ class DotsLogPipeline(Pipeline):
             stop_transform(stop_event)
         ]
         super(DotsLogPipeline, self).__init__(steps)
+
+class TotalsReportLogPipeline(Pipeline):
+    def __init__(self, input, output, tail=False):
+        stop_event = threading.Event()
+
+        steps = [
+            read_transform(input, tail=tail),
+            parse_transform(stop_event),
+            fanout(
+                totals_report_transform(stop_event),
+            ),
+            fanin(
+                "".join
+            ),
+            write_transform(output),
+            stop_transform(stop_event)
+        ]
+        super(TotalsReportLogPipeline, self).__init__(steps)
+
+class FailsReportLogPipeline(Pipeline):
+    def __init__(self, input, output, tail=False):
+        stop_event = threading.Event()
+
+        steps = [
+            read_transform(input, tail=tail),
+            parse_transform(stop_event),
+            fanout(
+                fails_report_transform(stop_event),
+            ),
+            fanin(
+                "".join
+            ),
+            write_transform(output),
+            stop_transform(stop_event)
+        ]
+        super(FailsReportLogPipeline, self).__init__(steps)
+
+class VersionReportLogPipeline(Pipeline):
+    def __init__(self, input, output, tail=False):
+        stop_event = threading.Event()
+
+        steps = [
+            read_transform(input, tail=tail),
+            parse_transform(stop_event),
+            fanout(
+                version_report_transform(stop_event),
+            ),
+            fanin(
+                "".join
+            ),
+            write_transform(output),
+            stop_transform(stop_event)
+        ]
+        super(VersionReportLogPipeline, self).__init__(steps)

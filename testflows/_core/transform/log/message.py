@@ -27,6 +27,9 @@ class Message(object):
 class ProtocolMessage(Message):
     pass
 
+class VersionMessage(Message):
+    pass
+
 class InputMessage(Message):
     pass
 
@@ -245,6 +248,11 @@ class RawInput(RawFormat, InputMessage, namedtuple_with_defaults(
     pass
 
 class RawProtocol(RawFormat, ProtocolMessage, namedtuple_with_defaults(
-        "RawDebugMessage",
+        "RawProtocolMessage",
+        RawFormat.prefix.fields + "version")):
+    pass
+
+class RawVersion(RawFormat, VersionMessage, namedtuple_with_defaults(
+        "RawVersionMessage",
         RawFormat.prefix.fields + "version")):
     pass
