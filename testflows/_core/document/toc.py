@@ -27,19 +27,27 @@ class Visitor(PTNodeVisitor):
         self.output = []
         super(Visitor, self).__init__(*args, **kwargs)
 
-    def visit_heading(self, node, children):
+    def process_heading(self, node, children):
         level = node[0].value.count("#")
         # only include in TOC levels 2 and higher
         if level < 2:
-            return
+            return None
         # normalize header level
         level -= 1
         if self.current_level < level:
-            self.levels = self.levels[:level]
+            self.levels = self.levels[:level - 1]
         if len(self.levels) < level:
-            self.levels += [0] * (level-len(self.levels))
+            self.levels += [0] * (level - len(self.levels))
         self.current_level = level
-        self.levels[self.current_level-1] += 1
+        self.levels[self.current_level - 1] += 1
+        num = '.'.join([str(l) for l in self.levels[:self.current_level]])
+        return level, num
+
+    def visit_heading(self, node, children):
+        res = self.process_heading(node, children)
+        if not res:
+            return
+        level, num = res
         name = node.heading_name.value
         anchor = re.sub(r"\s+", "-", re.sub(r"[^a-zA-Z0-9-_\s]+", "", name.lower()))
         # handle duplicate header ids

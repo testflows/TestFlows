@@ -24,6 +24,7 @@ from .short import transform as short_transform
 from .report.fails import transform as fails_report_transform
 from .report.totals import transform as totals_report_transform
 from .report.version import transform as version_report_transform
+from .report.results import transform as results_transform
 
 class Pipeline(object):
     """Combines multiple steps into a pipeline
@@ -204,3 +205,15 @@ class VersionReportLogPipeline(Pipeline):
             stop_transform(stop_event)
         ]
         super(VersionReportLogPipeline, self).__init__(steps)
+
+class ResultsLogPipeline(Pipeline):
+    def __init__(self, input, results):
+        stop_event = threading.Event()
+
+        steps = [
+            read_transform(input),
+            parse_transform(stop_event),
+            results_transform(results, stop_event),
+            stop_transform(stop_event)
+        ]
+        super(ResultsLogPipeline, self).__init__(steps)

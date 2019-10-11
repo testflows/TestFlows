@@ -146,7 +146,7 @@ def Parser():
         return requirement_heading, version, ZeroOrMore([priority, type, group, uid]), Optional(requirement_description), _(r"\n?")
 
     def document():
-        return Optional(OneOrMore([requirement, line])), EOF
+        return Optional(OneOrMore([requirement, heading, line])), EOF
 
     return PEGParser(document)
 
