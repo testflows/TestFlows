@@ -133,12 +133,12 @@ class Visitor(VisitorBase):
 class Handler(HandlerBase):
     @classmethod
     def add_command(cls, commands):
-        parser = commands.add_parser("requirements-coverage", help="requirements coverage report", epilog=epilog(),
-            description="Generate requirements coverage report.",
+        parser = commands.add_parser("srs-coverage", help="SRS (Software Requirements Specification) coverage report", epilog=epilog(),
+            description="Generate SRS (Software Requirements Specification) coverage report.",
             formatter_class=HelpFormatter)
 
-        parser.add_argument("requirements", metavar="requirements", type=argtype.file("r", bufsize=1, encoding="utf-8"),
-                nargs=1, help="requirements source file")
+        parser.add_argument("srs", metavar="srs", type=argtype.file("r", bufsize=1, encoding="utf-8"),
+                nargs=1, help="source file")
         parser.add_argument("input", metavar="input", type=argtype.file("r", bufsize=1, encoding="utf-8"),
                 nargs="?", help="input log, default: stdin", default="-")
         parser.add_argument("output", metavar="output", type=argtype.file("w", bufsize=1, encoding="utf-8"),
@@ -194,7 +194,7 @@ class Handler(HandlerBase):
 
     def handle(self, args):
         parser = Parser()
-        with args.requirements[0] as requirements:
+        with args.srs[0] as requirements:
             requirements_data = requirements.read()
 
         tree = parser.parse(requirements_data)
