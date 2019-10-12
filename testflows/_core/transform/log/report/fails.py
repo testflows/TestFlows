@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import functools
 import testflows.settings as settings
 
 from testflows._core.flags import Flags, SKIP
@@ -21,22 +22,22 @@ from testflows._core.cli.colors import color
 
 indent = " " * 2
 
-def color_result(result, text, attrs=None):
+def color_result(result, attrs=None):
     if attrs is None:
-        attrs = []
+        attrs = ["bold"]
     if result.startswith("X"):
-        return color("\u2718 " + text, "blue", attrs=attrs)
+        return functools.partial(color, color="blue", attrs=attrs)
     elif result == "OK":
-        return color("\u2714" + text, "green", attrs=attrs)
+        return functools.partial(color, color="green", attrs=attrs)
     elif result == "Skip":
-        return color("\u2704" + text, "cyan", attrs=attrs)
+        return functools.partial(color, color="cyan", attrs=attrs)
     # Error, Fail, Null
     elif result == "Error":
-        return color("\u2718 " + text, "yellow", attrs=attrs)
+        return functools.partial(color, color="yellow", attrs=attrs)
     elif result == "Fail":
-         return color("\u2718 " + text, "red", attrs=attrs)
+        return functools.partial(color, color="red", attrs=attrs)
     elif result == "Null":
-        return color("\u2718 " + text, "magenta", attrs=attrs)
+        return functools.partial(color, color="magenta", attrs=attrs)
     else:
         raise ValueError(f"unknown result {result}")
 
@@ -69,20 +70,22 @@ def generate(results):
 
     for entry in results:
         msg, result = results[entry]
+        _color = color_result(result)
         if not result.startswith("X"):
             continue
-        xfails += f"{color_result(result, result + ' ' + msg.test)}\n"
+        xfails += _color('\u2718') + f" [ { _color(result) } ] {msg.test}\n"
 
     if xfails:
-        xfails = color("\nKnown failing tests\n\n", "blue", attrs=["bold"]) + xfails
+        xfails = color("\nKnown failing tests\n\n", "white", attrs=["bold"]) + xfails
 
     for entry in results:
         msg, result = results[entry]
+        _color = color_result(result)
         if result.startswith("X"):
             continue
-        fails += f"{color_result(result, result + ' ' + msg.test)}\n"
+        fails += _color("\u2718") + f" [ {_color(result)} ] {msg.test}\n"
     if fails:
-        fails = color("\nFailing tests\n\n", "red", attrs=["bold"]) + fails
+        fails = color("\nFailing tests\n\n", "white", attrs=["bold"]) + fails
 
     report = f"{xfails}{fails}"
 
