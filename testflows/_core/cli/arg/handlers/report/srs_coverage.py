@@ -158,7 +158,7 @@ class Handler(HandlerBase):
                 if tested.get(heading.name) is None:
                     counts.untested += 1
                     if "untested" in only:
-                        output.write(color(f"{indent}\u2718 ", "grey", attrs=["bold"]) + color_primary()(f"{heading.num} {heading.name}\n"))
+                        output.write(color(f"{indent}\u2715 ", "grey", attrs=["bold"]) + color_primary()(f"{heading.num} {heading.name}\n"))
                         output.write(color(f"{indent}  no tests\n", "white", attrs=["dim"]))
                 else:
                     _tests = []
