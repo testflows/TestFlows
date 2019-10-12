@@ -73,11 +73,11 @@ class Counts(object):
         s = color(s, "white", attrs=["bold"])
         r = []
         if self.ok > 0:
-            r.append(color_counts("Verified")(f"{self.ok} verified"))
+            r.append(color_counts("Verified")(f"{self.ok} verified {(self.ok / self.units) * 100:.2f}%"))
         if self.nok > 0:
-            r.append(color_counts("Unverified")(f"{self.nok} unverified"))
+            r.append(color_counts("Unverified")(f"{self.nok} unverified {(self.nok / self.units) * 100:.2f}%"))
         if self.untested > 0:
-            r.append(color_counts("Untested")(f"{self.untested} untested"))
+            r.append(color_counts("Untested")(f"{self.untested} untested {(self.untested / self.units) * 100:.2f}%"))
         s += color(", ", "white", attrs=["bold"]).join(r)
         s += color(")\n", "white", attrs=["bold"])
         return s
