@@ -50,9 +50,9 @@ def color_result(result):
     return functools.partial(color, color="red", attrs=["bold"])
 
 def color_counts(result):
-    if result == "Verified":
+    if result == "Satisfied":
         return functools.partial(color, color="green", attrs=["bold"])
-    elif result == "Untested":
+    elif result == "Unsatisfied":
         return functools.partial(color, color="grey", attrs=["bold"])
     # Unverified
     return functools.partial(color, color="red", attrs=["bold"])
@@ -73,9 +73,9 @@ class Counts(object):
         s = color(s, "white", attrs=["bold"])
         r = []
         if self.ok > 0:
-            r.append(color_counts("Verified")(f"{self.ok} verified {(self.ok / self.units) * 100:.1f}%"))
+            r.append(color_counts("Satisfied")(f"{self.ok} satisfied {(self.ok / self.units) * 100:.1f}%"))
         if self.nok > 0:
-            r.append(color_counts("Unverified")(f"{self.nok} unverified {(self.nok / self.units) * 100:.1f}%"))
+            r.append(color_counts("Unsatisfied")(f"{self.nok} unsatisfied {(self.nok / self.units) * 100:.1f}%"))
         if self.untested > 0:
             r.append(color_counts("Untested")(f"{self.untested} untested {(self.untested / self.units) * 100:.1f}%"))
         s += color(", ", "white", attrs=["bold"]).join(r)
@@ -158,7 +158,7 @@ class Handler(HandlerBase):
                 if tested.get(heading.name) is None:
                     counts.untested += 1
                     if "untested" in only:
-                        output.write(color(f"{indent}\u2715 ", "grey", attrs=["bold"]) + color_primary()(f"{heading.num} {heading.name}\n"))
+                        output.write(color(f"{indent}\u270E ", "grey", attrs=["bold"]) + color_primary()(f"{heading.num} {heading.name}\n"))
                         output.write(color(f"{indent}  no tests\n", "white", attrs=["dim"]))
                 else:
                     _tests = []
