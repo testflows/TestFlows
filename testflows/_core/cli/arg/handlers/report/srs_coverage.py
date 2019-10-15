@@ -144,8 +144,8 @@ class Handler(HandlerBase):
         parser.add_argument("output", metavar="output", type=argtype.file("w", bufsize=1, encoding="utf-8"),
                 nargs="?", help='output file, default: stdout', default="-")
         parser.add_argument("--only", metavar="status", type=str, nargs="+", help="verification status",
-            choices=["verified", "unverified", "untested"],
-            default=["verified", "unverified", "untested"])
+            choices=["satisfied", "unsatisfied", "untested"],
+            default=["satisfied", "unsatisfied", "untested"])
         parser.set_defaults(func=cls())
 
     def generate(self, output, headings, tested, only):
@@ -176,10 +176,10 @@ class Handler(HandlerBase):
                     if _priority > 2:
                         icon = "\u2718"
                         counts.nok += 1
-                        if "unverified" not in only:
+                        if "unsatisfied" not in only:
                             _include = False
                     else:
-                        if "verified" not in only:
+                        if "satisfied" not in only:
                             _include = False
                         counts.ok += 1
 
