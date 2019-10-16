@@ -14,41 +14,32 @@
 from setuptools import setup
 
 setup(
-    name="testflows.core",
+    name="testflows",
     version="__VERSION__",
-    description="TestFlows - Core",
+    description="TestFlows Test Framework",
     author="Vitaliy Zakaznikov",
     author_email="vzakaznikov@testflows.com",
-    url="http://testflows.com",
+    url="https://github.com/testflows/testflows",
+    classifiers=[
+        "Development Status :: 2 - Pre-Alpha",
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: POSIX :: Linux",
+    ],
+    python_requires='>=3.6',
     license="Apache-2.0",
     packages=[
-        "testflows.core",
-        "testflows.settings",
-        "testflows._core",
-        "testflows._core.contrib",
-        "testflows._core.contrib.arpeggio",
-        "testflows._core.utils",
-        "testflows._core.transform",
-        "testflows._core.transform.log",
-        "testflows._core.transform.log.report",
-        "testflows._core.document",
-        "testflows._core.cli",
-        "testflows._core.cli.arg",
-        "testflows._core.cli.arg.handlers",
-        "testflows._core.cli.arg.handlers.report",
-        "testflows._core.cli.arg.handlers.transform",
-        "testflows._core.cli.arg.handlers.document",
-        "testflows._core.cli.arg.handlers.requirement"
+        "testflows",
         ],
-    scripts=[
-        "testflows/_core/bin/tfs",
-    ],
     zip_safe=False,
     install_requires=[
+        "testflows.core",
+        "testflows.asserts",
+        "testflows.uexpect",
+        "testflows.connect"
     ],
     extras_require={
         "dev": [
-            "sphinx",
         ]
     }
 )
