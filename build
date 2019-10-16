@@ -13,69 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import re
 import shutil
 import argparse
 import subprocess
 
-from datetime import datetime
-
-parser = argparse.ArgumentParser(description="TestFlows - Core build script")
+parser = argparse.ArgumentParser(description="TestFlows - build script")
 parser.add_argument("--debug", help="enable debugging", action="store_true", default=False)
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-package = os.path.join("testflows", "_core")
-init_path = os.path.join(current_dir, package, "__init__.py")
-setup_path = os.path.join(current_dir, "setup.py")
-
-def get_base_version():
-    """Return package base version.
-    """
-    version = None
-    with open(init_path) as fd:
-        for line in fd.readlines():
-            if line.startswith("__version__ = "):
-                match = re.match("__version__\s=\s\"(?P<version>.+).__VERSION__", line)
-                if match:
-                    version = match.groupdict().get('version')
-                    if version:
-                        break
-    if not version:
-        raise ValueError("failed to get base version number")
-    return version
-
-def get_revision():
-    """Return build revision.
-    """
-    now = datetime.utcnow()
-    major_revision = now.strftime("%y%m%d")
-    minor_revision = now.strftime("%-H%-M%-S")
-    return major_revision + ".1" + minor_revision
-
-def set_version(path, version):
-    """Set version in the file.
-
-    :param path: path
-    :param version: version
-    """
-    with open(path, "a+") as fd:
-        fd.seek(0)
-        content = fd.read()
-        fd.seek(0)
-        fd.truncate()
-        fd.write(content.replace("__VERSION__", version))
-    return content
-
-def unset_version(path, content):
-    """Unset version in the file.
-
-    :param path: path
-    :param content: original file content
-    """
-    with open(path, "a+") as fd:
-        fd.seek(0)
-        fd.truncate()
-        fd.write(content)
 
 def build_package(args, options):
     """Build package.
@@ -100,20 +45,7 @@ def build(args, options=None):
     if os.path.exists("dist"):
         shutil.rmtree("dist")
       
-    base_version = get_base_version()
-    revision = get_revision()
-    version = ".".join([base_version, revision])
-    init_content, setup_content = None, None
-
-    try:
-        init_content = set_version(init_path, revision)
-        setup_content = set_version(setup_path, version)
-        build_package(args, options)
-    finally:
-        if init_content:
-            unset_version(init_path, init_content)
-        if setup_content:
-            unset_version(setup_path, setup_content)
+    build_package(args, options)
 
 if __name__ == "__main__":
     args = parser.parse_args()

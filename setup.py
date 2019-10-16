@@ -15,7 +15,7 @@ from setuptools import setup
 
 setup(
     name="testflows",
-    version="__VERSION__",
+    version="1.2",
     description="TestFlows Test Framework",
     author="Vitaliy Zakaznikov",
     author_email="vzakaznikov@testflows.com",
@@ -28,9 +28,6 @@ setup(
     ],
     python_requires='>=3.6',
     license="Apache-2.0",
-    packages=[
-        "testflows",
-        ],
     zip_safe=False,
     install_requires=[
         "testflows.core",
