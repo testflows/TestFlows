@@ -14,5 +14,5 @@
 # limitations under the License.
 import subprocess
 
-subprocess.run("pip3 uninstall -y testflows.core", shell=True)
+subprocess.run("pip3 uninstall -y testflows", shell=True)
 subprocess.run("pip3 install ./dist/*.tar.gz", shell=True)
