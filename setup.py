@@ -15,7 +15,7 @@ from setuptools import setup
 
 setup(
     name="testflows",
-    version="1.2",
+    version="1.2.1",
     description="TestFlows Test Framework",
     author="Vitaliy Zakaznikov",
     author_email="vzakaznikov@testflows.com",
@@ -30,10 +30,10 @@ setup(
     license="Apache-2.0",
     zip_safe=False,
     install_requires=[
-        "testflows.core",
-        "testflows.asserts",
-        "testflows.uexpect",
-        "testflows.connect"
+        "testflows.core>=1.2.191016.122959",
+        "testflows.asserts>=5.2.191016.1221916",
+        "testflows.uexpect>=1.2.191016.1222050",
+        "testflows.connect>=1.2.191016.1222213"
     ],
     extras_require={
         "dev": [
