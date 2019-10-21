@@ -49,7 +49,7 @@ An inline test scenario can be defined as follows
 ```python
 from testflows.core import Scenario
 
-with Scenario("Hello Scenario!"):
+with Scenario("Hello TestFlows!"):
     pass
 ```
 
