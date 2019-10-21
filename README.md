@@ -3,7 +3,7 @@
 **TestFlows is still work in progress and is currently under development.
 Please use it only for reference.**
 
-![TestFlows](https://raw.githubusercontent.com/testflows/TestFlows-ArtWork/master/images/logo.svg)
+![TestFlows](https://raw.githubusercontent.com/testflows/TestFlows-ArtWork/master/images/logo.png)
 
 ## Introduction
 
