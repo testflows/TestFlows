@@ -3,15 +3,22 @@
 **TestFlows is still work in progress and is currently under development.
 Please use it only for reference.**
 
+![TestFlows](https://raw.githubusercontent.com/testflows/TestFlows-ArtWork/master/images/logo.svg)
+
 ## Introduction
 
 [TestFlows] is a **flow** oriented test framework that can be used for functional,
-integration, acceptance and unit testing. It uses uses **everything is a test** approach
-with the focus on providing test designers flexibility in writing and running the tests.
+integration, acceptance and unit testing. It uses **everything is a test** approach
+with the focus on providing test designers flexibility in writing and running their tests.
+
+## Supported environment
+
+* [Ubuntu] 18.04
+* [Python 3] >= 3.6
 
 ## Installation
 
-You can install `TestFlows` using `pip3`
+You can install [TestFlows] using [pip3]
 
 ```bash
 $ pip3 install testflows
@@ -27,7 +34,7 @@ $ ./build ; ./install
 
 ## Styles
 
-[TestFlows] supports defining your tests using either the traditional keywords
+[TestFlows] supports defining tests using either the traditional keywords
 
 *  **Module**, **Suite**, **Test**, and **Step**
 
@@ -46,7 +53,7 @@ with Scenario("Hello Scenario!"):
     pass
 ```
 
-then just run it using `python3`
+then just run it using `python3` command
 
 ```bash
 $ python3 ./test.py 
@@ -69,3 +76,6 @@ Join [@TestFlows] channel on [Telegram].
 [Telegram]: https://telegram.org/
 [BDD]: https://en.wikipedia.org/wiki/Behavior-driven_development
 [TestFlows]: https://github.com/testflows/testflows
+[pip3]: https://github.com/pypa/pip
+[Python 3]: https://www.python.org/
+[Ubuntu]: https://ubuntu.com/ 
