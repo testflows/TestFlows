@@ -13,12 +13,12 @@
 # limitations under the License.
 from setuptools import setup
 
-with open("README.md", "r") as fd:
+with open("README.md", "r", encoding="utf-8") as fd:
     long_description = fd.read()
 
 setup(
     name="testflows",
-    version="1.3.2",
+    version="1.3.3",
     description="TestFlows Test Framework",
     author="Vitaliy Zakaznikov",
     author_email="vzakaznikov@testflows.com",
