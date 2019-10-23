@@ -35,7 +35,7 @@ setup(
     license="Apache-2.0",
     zip_safe=False,
     install_requires=[
-        "testflows.core>=1.3.191019.1121035",
+        "testflows.core>=1.3.191023.1004820",
         "testflows.asserts>=5.3.191019.1121011",
         "testflows.uexpect>=1.2.191019.112953",
         "testflows.connect>=1.3.191019.112851"
