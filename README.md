@@ -38,9 +38,9 @@ $ ./build ; ./install
 
 *  **Module**, **Suite**, **Test**, and **Step**
 
-or using [BDD] (Behavior Driven Development) keywords
+or using [BDD] (Behavior Driven Development) inspired keywords
 
-* **Module**, **Feature**, **Scenario**, **Given**, **When** and **Then**
+* **Module**, **Feature**, **Scenario**, **Given**, **When**, **Then**, **But**, **And**, **By** and **Finally**
 
 ## Hello [TestFlows]
 

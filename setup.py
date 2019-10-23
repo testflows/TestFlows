@@ -18,7 +18,7 @@ with open("README.md", "r", encoding="utf-8") as fd:
 
 setup(
     name="testflows",
-    version="1.3.3",
+    version="1.3.4",
     description="TestFlows Test Framework",
     author="Vitaliy Zakaznikov",
     author_email="vzakaznikov@testflows.com",
