@@ -18,7 +18,7 @@ with open("README.md", "r", encoding="utf-8") as fd:
 
 setup(
     name="testflows",
-    version="1.4.3",
+    version="1.4.4",
     description="TestFlows Test Framework",
     author="Vitaliy Zakaznikov",
     author_email="vzakaznikov@testflows.com",
@@ -38,7 +38,7 @@ setup(
         "testflows.core>=1.4.200414.1214842",
         "testflows.asserts>=5.3.191019.1125113",
         "testflows.uexpect>=1.2.191027.1152544",
-        "testflows.connect>=1.3.191030.1131916"
+        "testflows.connect>=1.3.200421.1170112"
     ],
     extras_require={
         "dev": [
