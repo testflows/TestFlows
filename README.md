@@ -1,6 +1,6 @@
-# TestFlows Test Framework
+# [TestFlows] Open-Source Test Framework
 
-**TestFlows is still work in progress and is currently under development.
+**[TestFlows] is still work in progress and is currently under development.
 Please use it only for reference.**
 
 ![TestFlows](https://raw.githubusercontent.com/testflows/TestFlows-ArtWork/master/images/logo.png)
@@ -10,6 +10,10 @@ Please use it only for reference.**
 [TestFlows] is a **flow** oriented test framework that can be used for functional,
 integration, acceptance and unit testing. It uses **everything is a test** approach
 with the focus on providing test designers flexibility in writing and running their tests.
+
+## Documentation
+
+You can find [TestFlows]'s documentation at https://testflows.com.
 
 ## Supported environment
 
@@ -57,24 +61,29 @@ then just run it using `python3` command
 
 ```bash
 $ python3 ./test.py 
-Oct 21,2019 18:44:06   ⟥  Scenario Hello TestFlows!
+Jul 12,2020 14:30:20   ⟥  Scenario Hello TestFlows!
                  1ms   ⟥⟤ OK Hello TestFlows!, /Hello TestFlows!
+
+Passing
+
+✔ [ OK ] /Hello TestFlows!
 
 1 scenario (1 ok)
 
-Total time 1ms
+Total time 2ms
 
-Executed on Dec 31,1969 19:00
-TestFlows Test Framework v1.3.191021.1223802
+Executed on Jul 12,2020 14:30
+TestFlows Test Framework v1.6.200712.1132037
 ```
 
 ## What to know more?
 
-Join [@TestFlows] channel on [Telegram].
+Find more information about [TestFlows] at https://testflows.com.
+Join our channel on [Telegram] or follow us on [Twitter].
 
-[@TestFlows]: https://telegram.me/testflows
-[Telegram]: https://telegram.org/
-[BDD]: https://en.wikipedia.org/wiki/Behavior-driven_development
+[TestFlows]: https://testflows.com
+[Telegram]: https://telegram.me/testflows
+[Twitter]: https://twitter.com/TestFlowsTF
 [TestFlows]: https://github.com/testflows/testflows
 [pip3]: https://github.com/pypa/pip
 [Python 3]: https://www.python.org/
