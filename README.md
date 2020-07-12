@@ -1,6 +1,6 @@
-# [TestFlows] Open-Source Test Framework
+# TestFlows Open-Source Software Testing Framework
 
-**[TestFlows] is still work in progress and is currently under development.
+**TestFlows is still work in progress and is currently under development.
 Please use it only for reference.**
 
 ![TestFlows](https://raw.githubusercontent.com/testflows/TestFlows-ArtWork/master/images/logo.png)
@@ -46,7 +46,7 @@ or using keywords such as
 
 * **Module**, **Feature**, **Scenario**, **Given**, **When**, **Then**, **But**, **And**, **By** and **Finally**
 
-## Hello [TestFlows]
+## Hello TestFlows
 
 An inline test scenario can be defined as follows
 
@@ -78,7 +78,7 @@ TestFlows Test Framework v1.6.200712.1132037
 
 ## What to know more?
 
-Find more information about [TestFlows] at https://testflows.com.
+Find more information about [TestFlows] at https://testflows.com.   
 Join our channel on [Telegram] or follow us on [Twitter].
 
 [TestFlows]: https://testflows.com
