@@ -38,7 +38,7 @@ $ ./build ; ./install
 
 *  **Module**, **Suite**, **Test**, and **Step**
 
-or using [BDD] (Behavior Driven Development) inspired keywords
+or using keywords such as
 
 * **Module**, **Feature**, **Scenario**, **Given**, **When**, **Then**, **But**, **And**, **By** and **Finally**
 
