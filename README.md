@@ -1,19 +1,19 @@
-# TestFlows Open-Source Software Testing Framework
+# TestFlows.com Open-Source Software Testing Framework
 
-**TestFlows is still work in progress and is currently under development.
+**TestFlows.com Open-Source Software Testing Framework is still work in progress and is currently under development.
 Please use it only for reference.**
 
-![TestFlows](https://raw.githubusercontent.com/testflows/TestFlows-ArtWork/master/images/logo.png)
+![TestFlows.com Open-Source Software Testing Framework](https://raw.githubusercontent.com/testflows/TestFlows-ArtWork/master/images/logo.png)
 
 ## Introduction
 
-[TestFlows] is a **flow** oriented test framework that can be used for functional,
+[TestFlows.com Open-Source Software Testing Framework] is a **flow** oriented test framework that can be used for functional,
 integration, acceptance and unit testing. It uses **everything is a test** approach
 with the focus on providing test designers flexibility in writing and running their tests.
 
 ## Documentation
 
-You can find [TestFlows]'s documentation at https://testflows.com.
+You can find [TestFlows.com Open-Source Software Testing Framework]'s documentation at https://testflows.com.
 
 ## Supported environment
 
@@ -22,7 +22,7 @@ You can find [TestFlows]'s documentation at https://testflows.com.
 
 ## Installation
 
-You can install [TestFlows] using [pip3]
+You can install [TestFlows.com Open-Source Software Testing Framework] using [pip3]
 
 ```bash
 $ pip3 install testflows
@@ -38,7 +38,7 @@ $ ./build ; ./install
 
 ## Styles
 
-[TestFlows] supports defining tests using either the traditional keywords
+[TestFlows.com Open-Source Software Testing Framework] supports defining tests using either the traditional keywords
 
 *  **Module**, **Suite**, **Test**, and **Step**
 
@@ -78,13 +78,12 @@ TestFlows.com Open-Source Software Testing Framework v1.6.200712.1132037
 
 ## What to know more?
 
-Find more information about [TestFlows] at https://testflows.com.   
+Find more information about [TestFlows.com Open-Source Software Testing Framework] at https://testflows.com.   
 Join our channel on [Telegram] or follow us on [Twitter].
 
-[TestFlows]: https://testflows.com
+[TestFlows.com Open-Source Software Testing Framework]: https://testflows.com
 [Telegram]: https://telegram.me/testflows
 [Twitter]: https://twitter.com/TestFlowsTF
-[TestFlows]: https://github.com/testflows/testflows
 [pip3]: https://github.com/pypa/pip
 [Python 3]: https://www.python.org/
 [Ubuntu]: https://ubuntu.com/ 
