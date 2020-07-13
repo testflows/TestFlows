@@ -1,5 +1,5 @@
 # Copyright 2019 Katteli Inc.
-# TestFlows Test Framework (http://testflows.com)
+# TestFlows.com Open-Source Software Testing Framework (http://testflows.com)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ with open("README.md", "r", encoding="utf-8") as fd:
 
 setup(
     name="testflows",
-    version="1.6.31",
-    description="TestFlows Test Framework",
+    version="1.6.32",
+    description="TestFlows.com Open-Source Software Testing Framework",
     author="Vitaliy Zakaznikov",
     author_email="vzakaznikov@testflows.com",
     long_description=long_description,
@@ -36,11 +36,11 @@ setup(
     license="Apache-2.0",
     zip_safe=False,
     install_requires=[
-        "testflows.core>=1.6.200712.1132037",
-        "testflows.asserts>=5.3.200617.1014548",
-        "testflows.uexpect>=1.6.200617.1013524",
-        "testflows.connect>=1.6.200617.1014003",
-        "testflows.database>=1.6.200617.1013239"
+        "testflows.core>=1.6.200713.1140428",
+        "testflows.asserts>=5.3.200713.1141228",
+        "testflows.uexpect>=1.6.200713.1141539",
+        "testflows.connect>=1.6.200713.1141644",
+        "testflows.database>=1.6.200713.1142213"
     ],
     extras_require={
         "dev": [

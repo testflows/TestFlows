@@ -73,7 +73,7 @@ Passing
 Total time 2ms
 
 Executed on Jul 12,2020 14:30
-TestFlows Test Framework v1.6.200712.1132037
+TestFlows.com Open-Source Software Testing Framework v1.6.200712.1132037
 ```
 
 ## What to know more?
