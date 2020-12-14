@@ -76,7 +76,7 @@ Executed on Jul 12,2020 14:30
 TestFlows.com Open-Source Software Testing Framework v1.6.200712.1132037
 ```
 
-## What to know more?
+## Want to know more?
 
 Find more information about [TestFlows.com Open-Source Software Testing Framework] at https://testflows.com.   
 Join our channel on [Telegram] or follow us on [Twitter].
