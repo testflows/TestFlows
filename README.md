@@ -17,8 +17,8 @@ You can find [TestFlows.com Open-Source Software Testing Framework]'s documentat
 
 ## Supported environment
 
-* [Ubuntu] 18.04
-* [Python 3] >= 3.6
+* [Ubuntu] 20.04
+* [Python 3] >= 3.8
 
 ## Installation
 
