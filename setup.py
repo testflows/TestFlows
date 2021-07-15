@@ -19,7 +19,7 @@ with open("README.md", "r", encoding="utf-8") as fd:
 
 setup(
     name="testflows",
-    version="1.7.2",
+    version="1.7.3",
     description="TestFlows.com Open-Source Software Testing Framework",
     author="Vitaliy Zakaznikov",
     author_email="vzakaznikov@testflows.com",
@@ -32,7 +32,7 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: POSIX :: Linux",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     license="Apache-2.0",
     zip_safe=False,
     install_requires=[
