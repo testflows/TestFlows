@@ -79,11 +79,10 @@ TestFlows.com Open-Source Software Testing Framework v1.6.200712.1132037
 ## Want to know more?
 
 Find more information about [TestFlows.com Open-Source Software Testing Framework] at https://testflows.com.   
-Join our channel on [Telegram] or follow us on [Twitter].
+Join our channel on [Telegram].
 
 [TestFlows.com Open-Source Software Testing Framework]: https://testflows.com
 [Telegram]: https://telegram.me/testflows
-[Twitter]: https://twitter.com/TestFlowsTF
 [pip3]: https://github.com/pypa/pip
 [Python 3]: https://www.python.org/
 [Ubuntu]: https://ubuntu.com/ 
