@@ -1,8 +1,5 @@
 # TestFlows.com Open-Source Software Testing Framework
 
-**TestFlows.com Open-Source Software Testing Framework is still work in progress and is currently under development.
-Please use it only for reference.**
-
 ![TestFlows.com Open-Source Software Testing Framework](https://raw.githubusercontent.com/testflows/TestFlows-ArtWork/master/images/logo.png)
 
 ## Introduction
