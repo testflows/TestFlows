@@ -1,6 +1,7 @@
-         The TestFlows.com Open-Source Software Testing Framework
-          Individual Contributor License Agreement ("Agreement")
-                            (version 1.0)
+```
+   The TestFlows.com Open-Source Software Testing Framework
+   Individual Contributor License Agreement ("Agreement")
+   (version 1.0)
    
    This Agreement is derived and differs from the original provided by
    Apache Software Foundation (https://www.apache.org/foundation/) at
@@ -45,7 +46,7 @@
       including any modifications or additions to an existing work, that
       is intentionally submitted by You to the Maintainers for inclusion
       in, or documentation of, any of the products owned or managed by
-      the FMaintainer (the "Work"). For the purposes of this definition,
+      the Maintainers (the "Work"). For the purposes of this definition,
       "submitted" means any form of electronic, verbal, or written
       communication sent to the Maintainers or its representatives,
       including but not limited to communication on electronic mailing
@@ -119,4 +120,4 @@
       inaccurate in any respect.
    
    Please sign: __________________________________ Date: _______________
-_
+```

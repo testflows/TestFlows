@@ -1,6 +1,7 @@
-          The TestFlows.com Open-Source Software Testing Framework
-            Corporate Contributor License Agreement ("Agreement")
-                              (version 1.0)
+```
+   The TestFlows.com Open-Source Software Testing Framework
+   Corporate Contributor License Agreement ("Agreement")
+   (version 1.0)
 
    This Agreement is derived and differs from the original provided by
    Apache Software Foundation (https://www.apache.org/foundation/) at
@@ -151,3 +152,4 @@ Schedule B
 
    [Identification of optional concurrent software grant.  Would be
     left blank or omitted if there is no concurrent software grant.]
+```
