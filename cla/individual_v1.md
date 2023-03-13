@@ -46,7 +46,7 @@
       including any modifications or additions to an existing work, that
       is intentionally submitted by You to the Maintainers for inclusion
       in, or documentation of, any of the products owned or managed by
-      the FMaintainer (the "Work"). For the purposes of this definition,
+      the Maintainers (the "Work"). For the purposes of this definition,
       "submitted" means any form of electronic, verbal, or written
       communication sent to the Maintainers or its representatives,
       including but not limited to communication on electronic mailing
