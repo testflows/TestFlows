@@ -9,6 +9,16 @@ The following CLAs are derived from the original provided by
 Apache Software Foundation (https://www.apache.org/foundation/)
 that can be found at https://apache.org/licenses/contributor-agreements.html#clas.
 
+## Individual E-Signed Contributor License Agreement
+
+You can electronically sign the CLA inside your first pull request using
+[CLA Assistant](https://github.com/contributor-assistant/github-action)
+by reading CLA and then sign it by adding a comment containing the following text.
+
+`I have read the CLA Document and I hereby sign the CLA`.
+
+https://github.com/testflows/TestFlows/blob/master/cla/individual_esign_v1.md
+
 ## Individual Contributor License Agreement
 
 https://github.com/testflows/TestFlows/blob/master/cla/individual_v1.md
