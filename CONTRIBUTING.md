@@ -7,7 +7,7 @@ to cla@katteli.com.
 
 The following CLAs are derived from the original provided by
 Apache Software Foundation (https://www.apache.org/foundation/)
-at https://apache.org/licenses/.
+at https://apache.org/licenses/contributor-agreements.html#clas.
 
 ## Individual Contributor License Agreement
 
