@@ -5,6 +5,10 @@ and any of its sub-modules you need to complete and sign, then scan and
 email a pdf file of the applicable Contribution License Agreement (CLA)
 to cla@katteli.com.
 
+The following CLAs are derived from the original provided by
+Apache Software Foundation (https://www.apache.org/foundation/)
+at https://apache.org/licenses/.
+
 ## Individual Contributor License Agreement
 
 https://github.com/testflows/TestFlows/blob/master/cla/individual_v1.md
