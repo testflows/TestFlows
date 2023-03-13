@@ -1,3 +1,5 @@
+
+```
    The TestFlows.com Open-Source Software Testing Framework
    Individual Contributor License Agreement ("Agreement")
    (version 1.0)
@@ -21,7 +23,7 @@
    
    1. Definitions.
 
-      "You" (or "Your") shall mean the copyright owner or legal entity
+     "You" (or "Your") shall mean the copyright owner or legal entity
       authorized by the copyright owner that is making this Agreement
       with the Maintainers. For legal entities, the entity making a
       Contribution and all other entities that control, are controlled
@@ -31,6 +33,7 @@
       direction or management of such entity, whether by contract or
       otherwise, or (ii) ownership of fifty percent (50%) or more of the
       outstanding shares, or (iii) beneficial ownership of such entity.
+      
       "Contribution" shall mean any original work of authorship,
       including any modifications or additions to an existing work, that
       is intentionally submitted by You to the Maintainers for inclusion
@@ -107,3 +110,4 @@
    8. You agree to notify the Maintainers of any facts or circumstances of
       which you become aware that would make these representations
       inaccurate in any respect.
+```
