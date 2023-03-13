@@ -15,7 +15,7 @@ You can electronically sign the CLA inside your first pull request using
 [CLA Assistant](https://github.com/contributor-assistant/github-action)
 by reading CLA and then sign it by adding a comment containing the following text.
 
-`I have read the CLA Document and I hereby sign the CLA`.
+`I have read the CLA Document and I hereby sign the CLA`
 
 https://github.com/testflows/TestFlows/blob/master/cla/individual_esign_v1.md
 
