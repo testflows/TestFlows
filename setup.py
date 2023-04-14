@@ -19,7 +19,7 @@ with open("README.md", "r", encoding="utf-8") as fd:
 
 setup(
     name="testflows",
-    version="1.9.53",
+    version="1.9.60",
     description="TestFlows.com Open-Source Software Testing Framework",
     author="Vitaliy Zakaznikov",
     author_email="vzakaznikov@testflows.com",
@@ -32,22 +32,17 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: POSIX :: Linux",
     ],
-    python_requires='>=3.8',
+    python_requires=">=3.8",
     license="Apache-2.0",
-    packages=[
-        "testflows.version"
-    ],
+    packages=["testflows.version"],
     zip_safe=False,
     install_requires=[
         "testflows.core==1.9.230315.1003122",
         "testflows.asserts==6.5.221019.1152644",
         "testflows.stash==1.1.230317.1211113",
-        "testflows.uexpect==1.7.220902.1112725",
-        "testflows.connect==1.7.210811.1000931",
-        "testflows.database==1.6.200713.1142213"
+        "testflows.uexpect==1.7.230414.1210501",
+        "testflows.connect==1.7.230414.1210340",
+        "testflows.database==1.6.200713.1142213",
     ],
-    extras_require={
-        "dev": [
-        ]
-    }
+    extras_require={"dev": []},
 )
