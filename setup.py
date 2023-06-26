@@ -19,7 +19,7 @@ with open("README.md", "r", encoding="utf-8") as fd:
 
 setup(
     name="testflows",
-    version="1.9.61",
+    version="1.9.62",
     description="TestFlows.com Open-Source Software Testing Framework",
     author="Vitaliy Zakaznikov",
     author_email="vzakaznikov@testflows.com",
@@ -38,7 +38,7 @@ setup(
     zip_safe=False,
     install_requires=[
         "testflows.core==1.9.230315.1003122",
-        "testflows.asserts==6.5.230616.1120952",
+        "testflows.asserts==6.5.230626.1133416",
         "testflows.stash==1.1.230317.1211113",
         "testflows.uexpect==1.7.230414.1210501",
         "testflows.connect==1.7.230414.1210340",
