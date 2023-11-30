@@ -30,7 +30,7 @@ or from sources
 ```bash
 $ git clone https://github.com/testflows/TestFlows.git
 $ cd TestFlows
-$ ./build && ./install
+$ ./package && ./install
 ```
 
 ## Styles
