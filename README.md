@@ -4,7 +4,7 @@
 
 ## Introduction
 
-[TestFlows.com Open-Source Software Testing Framework] is a **flow** oriented test framework that can be used for functional,
+[TestFlows.com Open-Source Software Testing Framework] is a Python test library that can be used for functional,
 integration, acceptance and unit testing. It uses **everything is a test** approach
 with the focus on providing test designers flexibility in writing and running their tests.
 
